@@ -1,0 +1,9 @@
+{
+  "name": "bpo-lojistik-vercel",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0"
+  }
+}

@@ -1,0 +1,3406 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BPO LOJİSTİK SEFER TAKİBİ</title>
+<meta name="theme-color" content="#000080">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BPO Lojistik">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22BPO%20Lojistik%20Sefer%20Takibi%22%2C%22short_name%22%3A%22BPO%20Lojistik%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23d4d0c8%22%2C%22theme_color%22%3A%22%23000080%22%2C%22lang%22%3A%22tr%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'%23000080'%3E%3Cpath%20d%3D'M1%203h15v13H1z'%2F%3E%3Cpath%20d%3D'M16%208h4l3%203v5h-7V8z'%2F%3E%3Ccircle%20cx%3D'5.5'%20cy%3D'18.5'%20r%3D'2.5'%20fill%3D'%23d01010'%2F%3E%3Ccircle%20cx%3D'18.5'%20cy%3D'18.5'%20r%3D'2.5'%20fill%3D'%23d01010'%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<!-- DİNAMİK TIR SİMGESİ (FAVICON) -->
+<link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000080'><path d='M1 3h15v13H1z'/><path d='M16 8h4l3 3v5h-7V8z'/><circle cx='5.5' cy='18.5' r='2.5' fill='%23d01010'/><circle cx='18.5' cy='18.5' r='2.5' fill='%23d01010'/></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* BPO LOJİSTİK CLASSIC DESKTOP LOOK & FEEL */
+  :root {
+    --bg-main: #d4d0c8;
+    --bg-panel: #f5f4ea;
+    --bg-toolbar: #ece9d8;
+    --bg-input: #ffffff;
+    --text-main: #000000;
+    --border: #7f9db9;
+    --accent: #000080;
+    --grid-even: #fcfbf7;
+    --groupbox-bg: #f5f4ea;
+  }
+  body.theme-dark {
+    --bg-main: #1a1a2e;
+    --bg-panel: #16213e;
+    --bg-toolbar: #0f3460;
+    --bg-input: #1f2937;
+    --text-main: #e5e7eb;
+    --border: #4b5563;
+    --accent: #60a5fa;
+    --grid-even: #1e293b;
+    --groupbox-bg: #16213e;
+  }
+  body {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 11px;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  body.theme-dark .canias-groupbox { background-color: var(--groupbox-bg); border-color: var(--border); }
+  body.theme-dark .canias-groupbox-title { background-color: var(--groupbox-bg); color: var(--accent); }
+  body.theme-dark .canias-input, body.theme-dark .canias-select, body.theme-dark .canias-textarea {
+    background-color: var(--bg-input); color: var(--text-main); border-color: var(--border);
+  }
+  body.theme-dark .canias-grid { background-color: var(--bg-input); border-color: var(--border); }
+  body.theme-dark .canias-grid th { background: linear-gradient(to bottom, #334155 0%, #1e293b 100%); color: #e5e7eb; border-color: #475569; }
+  body.theme-dark .canias-grid td { border-color: #334155; color: var(--text-main); }
+  body.theme-dark .canias-grid tr:nth-child(even) { background-color: var(--grid-even); }
+  body.theme-dark .canias-btn { background: linear-gradient(to bottom, #334155 0%, #1e293b 100%); color: #e5e7eb; border-color: #64748b; box-shadow: none; }
+  body.theme-dark .canias-btn:hover { background: linear-gradient(to bottom, #3b82f6 0%, #1d4ed8 100%); border-color: #60a5fa; }
+  body.theme-dark .canias-btn.active { background: #1e40af; border-color: #60a5fa; color: #fff; }
+  body.theme-dark .draggable-item { background-color: var(--bg-input) !important; border-color: var(--border) !important; }
+  body.theme-dark [id^="tab"] { background-color: var(--bg-panel) !important; border-color: var(--border) !important; }
+
+  /* KAPSAMLI KOYU MOD — mevcut Classic görünüm korunur */
+  body.theme-dark .bg-white { background-color:#1f2937 !important; color:#e5e7eb !important; }
+  body.theme-dark .bg-gray-100 { background-color:#273449 !important; color:#e5e7eb !important; }
+  body.theme-dark .bg-gray-200 { background-color:#334155 !important; color:#e5e7eb !important; }
+  body.theme-dark .bg-blue-50 { background-color:#172554 !important; }
+  body.theme-dark .bg-blue-100 { background-color:#1e3a8a !important; }
+  body.theme-dark .bg-green-50 { background-color:#052e16 !important; }
+  body.theme-dark .bg-green-100 { background-color:#14532d !important; }
+  body.theme-dark .bg-green-200 { background-color:#166534 !important; }
+  body.theme-dark .bg-red-50 { background-color:#450a0a !important; }
+  body.theme-dark .bg-red-100 { background-color:#7f1d1d !important; }
+  body.theme-dark .bg-red-200 { background-color:#991b1b !important; }
+  body.theme-dark .bg-yellow-50 { background-color:#422006 !important; }
+  body.theme-dark .bg-orange-50 { background-color:#431407 !important; }
+  body.theme-dark .bg-purple-50 { background-color:#2e1065 !important; }
+  body.theme-dark .bg-purple-100 { background-color:#3b0764 !important; }
+  body.theme-dark .bg-amber-50 { background-color:#451a03 !important; }
+  body.theme-dark [class*="text-gray-"] { color:#cbd5e1 !important; }
+  body.theme-dark [class*="text-black"] { color:#f1f5f9 !important; }
+  body.theme-dark [class*="text-[#000080]"] { color:#93c5fd !important; }
+  body.theme-dark [class*="text-green-"] { color:#86efac !important; }
+  body.theme-dark [class*="text-red-7"], body.theme-dark [class*="text-red-8"] { color:#fca5a5 !important; }
+  body.theme-dark [class*="text-orange-"] { color:#fdba74 !important; }
+  body.theme-dark [class*="text-purple-"] { color:#d8b4fe !important; }
+  body.theme-dark [class*="border-gray-"] { border-color:#475569 !important; }
+  body.theme-dark [class*="border-blue-"] { border-color:#3b82f6 !important; }
+  body.theme-dark [class*="border-green-"] { border-color:#22c55e !important; }
+  body.theme-dark [class*="border-red-"] { border-color:#ef4444 !important; }
+  body.theme-dark [class*="border-yellow-"] { border-color:#eab308 !important; }
+  body.theme-dark .canias-groupbox-title { background-color:var(--groupbox-bg) !important; }
+  body.theme-dark .canias-input:focus, body.theme-dark .canias-select:focus, body.theme-dark .canias-textarea:focus { background-color:#172033 !important; color:#fff !important; }
+  body.theme-dark option { background:#1f2937; color:#f1f5f9; }
+  body.theme-dark .canias-btn-danger { background:linear-gradient(to bottom,#7f1d1d,#450a0a); color:#fecaca; }
+  body.theme-dark .canias-btn-success { background:linear-gradient(to bottom,#166534,#052e16); color:#bbf7d0; }
+  body.theme-dark .chat-message-read { color:#60a5fa !important; }
+  body.theme-dark #chatMessagesBox { background:#111827 !important; }
+  body.theme-dark #chatModal > div, body.theme-dark #userStatusModal > div, body.theme-dark #tripDetailModal > div, body.theme-dark #shortcutsModal > div { background:#111827 !important; }
+  body.theme-dark .bg-gradient-to-r { background-image:linear-gradient(to right,#020617,#1d4ed8) !important; }
+  body.theme-dark canvas { background:#111827 !important; }
+
+  /* BUTTON STYLE */
+  .canias-btn {
+    background: linear-gradient(to bottom, #ffffff 0%, #ece9d8 100%);
+    border: 1px solid #7f9db9;
+    border-radius: 2px;
+    box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #dcdcdc;
+    color: #000000;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 4px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+  }
+  .canias-btn:hover {
+    background: linear-gradient(to bottom, #e3f0fb 0%, #c1deec 100%);
+    border-color: #316ac5;
+  }
+  .canias-btn:active {
+    background: #d4d0c8;
+    box-shadow: inset 1px 1px 2px #7f9db9;
+  }
+  .canias-btn.active {
+    background: #c1deec;
+    border-color: #000080;
+    color: #000080;
+  }
+
+  .canias-btn-danger {
+    background: linear-gradient(to bottom, #fff0f0 0%, #f7c8c8 100%);
+    border-color: #a52a2a;
+    color: #800000;
+  }
+
+  .canias-btn-success {
+    background: linear-gradient(to bottom, #f0fff0 0%, #c8f7c8 100%);
+    border-color: #2e8b57;
+    color: #006400;
+  }
+
+  .canias-btn-lg {
+    font-size: 12px !important;
+    padding: 7px 16px !important;
+    border-width: 1px !important;
+  }
+
+  /* FORM COMPONENT STYLES */
+  .canias-input, .canias-select, .canias-textarea {
+    border: 1px solid #7f9db9;
+    background-color: #ffffff;
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    padding: 6px 8px;
+    min-height: 34px;
+    border-radius: 3px;
+    outline: none;
+    transition: all 0.15s ease-in-out;
+  }
+  .canias-input:focus, .canias-select:focus, .canias-textarea:focus {
+    border-color: #000080;
+    background-color: #ffffdd;
+    box-shadow: 0 0 3px rgba(0,0,128,0.4);
+  }
+
+  /* GROUPBOX PANEL */
+  .canias-groupbox {
+    border: 1px solid #7f9db9;
+    background-color: #f5f4ea;
+    border-radius: 2px;
+    position: relative;
+    padding: 14px 12px 12px 12px;
+    margin-top: 6px;
+    box-shadow: inset 1px 1px 0px #ffffff;
+  }
+  .canias-groupbox-title {
+    position: absolute;
+    top: -9px;
+    left: 10px;
+    background-color: #f5f4ea;
+    padding: 0 5px;
+    font-weight: bold;
+    color: #000080;
+    font-size: 11px;
+  }
+
+  /* DATA GRID */
+  .canias-grid {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #7f9db9;
+  }
+  .canias-grid th {
+    background: linear-gradient(to bottom, #ffffff 0%, #d4d0c8 100%);
+    border: 1px solid #808080;
+    color: #000000;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 5px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .canias-grid td {
+    border: 1px solid #d0d0d0;
+    padding: 4px 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .canias-grid tr:nth-child(even) { background-color: #fcfbf7; }
+  .canias-grid tr:hover {
+    background-color: #316ac5 !important;
+    color: #ffffff !important;
+  }
+  .canias-grid tr:hover td {
+    color: #ffffff !important;
+  }
+
+  .uppercase-input { text-transform: uppercase; }
+
+  /* DRAGGABLE CARDS */
+  .draggable-item {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  /* KAYAN BİLDİRİM BANNER ANİMASYONU */
+  @keyframes marqueeAnim {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marqueeAnim 55s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes chatFlash {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    50% { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.6); background: linear-gradient(to bottom, #ffe4e4 0%, #ffc9c9 100%); }
+  }
+  .chat-btn-flash {
+    animation: chatFlash 0.55s ease-in-out 4;
+    border-color: #dc2626 !important;
+  }
+  /* v3 usability layer — mevcut Classic görünümü korunur */
+  #liveOperationsPanel button { transition: background-color .12s ease; }
+  @media (max-width: 700px) { #liveOperationsPanel { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body class="flex flex-col h-screen">
+
+<!-- BİLDİRİM / TOAST MESAJI ALANI -->
+<div id="toastNotification" class="fixed top-3 right-3 z-50 hidden bg-[#000080] text-white font-bold px-4 py-2 rounded shadow-xl border border-white text-xs flex items-center gap-2">
+  <i data-lucide="check-circle" class="w-4 h-4 text-green-300"></i>
+  <span id="toastText">İşlem Başarılı !</span>
+</div>
+
+<!-- TOP MENUBAR -->
+<div class="bg-[#ece9d8] border-b border-[#7f9db9] px-2 py-1 flex justify-between items-center text-xs select-none">
+  <div class="flex items-center gap-2">
+    <span class="font-bold text-[#000080]">BPO LOJİSTİK SEFER TAKİBİ</span>
+    <span class="text-gray-400">|</span>
+    <span class="font-semibold text-gray-700">[LOG01] - Sevkiyat & Lojistik Yönetimi</span>
+  </div>
+  <div class="flex items-center gap-3 text-xs">
+    <span><strong>Tesis:</strong> <span id="activeFacilityBadge" class="text-[#000080] text-sm font-black">PANAYIR</span></span>
+    <button onclick="toggleTheme()" class="canias-btn" title="Tema Değiştir" id="themeToggleBtn"><i data-lucide="moon" class="w-3.5 h-3.5"></i> <span id="themeToggleLabel">Koyu</span></button>
+    <button onclick="toggleShortcutsModal()" class="canias-btn" title="Klavye Kısayolları"><i data-lucide="keyboard" class="w-3.5 h-3.5"></i></button>
+    <div class="flex items-center gap-1.5 bg-[#ffffff] px-2.5 py-1 border border-[#7f9db9] rounded shadow-inner">
+      <i data-lucide="clock" class="w-4 h-4 text-[#000080]"></i>
+      <span id="liveClock" class="font-mono text-sm font-black text-[#000080]">--:--:--</span>
+    </div>
+  </div>
+</div>
+
+<!-- SYSTEM TOOLBAR -->
+<div class="bg-[#f5f4ea] border-b border-[#7f9db9] p-1 flex justify-between items-center gap-1">
+  <div class="flex items-center gap-1 flex-wrap">
+    <button onclick="changeFacility()" class="canias-btn" title="Tesis Değiştir"><i data-lucide="building" class="w-3.5 h-3.5 text-[#000080]"></i> Tesis Değiştir</button>
+    <div class="h-4 w-[1px] bg-gray-400 mx-0.5"></div>
+    
+    <!-- ÜST MENÜ SEKMELERİ -->
+    <button id="tabBtn1" onclick="switchTab('entry')" class="canias-btn active"><i data-lucide="edit-3" class="w-3.5 h-3.5 text-green-700"></i> Sevkiyat Girişi</button>
+    <button id="tabBtnSearch" onclick="switchTab('search')" class="canias-btn"><i data-lucide="search" class="w-3.5 h-3.5 text-purple-700"></i> Gelişmiş Arama</button>
+    <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="canias-btn"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-indigo-700"></i> Dashboard</button>
+
+    <!-- SADECE ADMİN İÇİN GÖRÜNÜR SEKMELER -->
+    <button id="tabBtnTeyit" onclick="switchTab('teyit')" class="canias-btn hidden"><i data-lucide="check-square" class="w-3.5 h-3.5 text-green-800"></i> Firma ile Teyitleşme</button>
+    <button id="tabBtnAdminHeader" onclick="switchTab('admin')" class="canias-btn hidden"><i data-lucide="shield-alert" class="w-3.5 h-3.5 text-red-700"></i> Admin Paneli</button>
+    
+    <div class="h-4 w-[1px] bg-gray-400 mx-0.5"></div>
+    
+    <!-- KULLANICI DURUM POPUP BUTONU -->
+    <button onclick="toggleUserStatusModal()" class="canias-btn" title="Aktif / Pasif Kullanıcılar">
+      <i data-lucide="users" class="w-3.5 h-3.5 text-[#000080]"></i> 
+      <span>Kullanıcılar</span>
+      <span id="onlineCountBadge" class="bg-green-700 text-white rounded px-1 text-[9px] font-bold">0</span>
+    </button>
+
+    <!-- ANLIK SOHBET / YAZIŞMA BUTONU VE BİLDİRİM BİLEŞENİ -->
+    <button id="chatToolbarBtn" onclick="toggleChatModal()" class="canias-btn relative" title="Anlık Yazışma">
+      <i data-lucide="message-square" class="w-3.5 h-3.5 text-blue-800"></i>
+      <span>Sohbet</span><span id="chatSoundIcon" class="hidden text-orange-600" title="Yeni mesaj bildirimi">🔔</span>
+      <span id="chatUnreadBadge" class="hidden bg-red-600 text-white font-bold text-[9px] rounded-full px-1.5 py-0.2 animate-bounce">0</span>
+    </button>
+    
+    <div class="h-4 w-[1px] bg-gray-400 mx-0.5"></div>
+    <!-- YEDEKLEME BUTONLARI -->
+    <button onclick="exportJSONBackup()" class="canias-btn" title="Veritabanını JSON olarak indir"><i data-lucide="download" class="w-3.5 h-3.5 text-[#000080]"></i> Yedek Al</button>
+    <button onclick="document.getElementById('importBackupInput').click()" class="canias-btn" title="JSON Yedeğini Yükle"><i data-lucide="upload" class="w-3.5 h-3.5 text-purple-800"></i> Yedek Yükle</button>
+    <input type="file" id="importBackupInput" accept=".json" class="hidden" onchange="importJSONBackup(event)">
+  </div>
+  
+  <div class="flex items-center gap-3 pr-1">
+    <div class="text-right">
+      <span id="currentUserDisplay" class="text-sm font-black text-[#000080] block leading-tight">-</span>
+      <span id="currentUserRole" class="text-[10px] font-semibold text-gray-700 block leading-tight">-</span>
+    </div>
+    <button onclick="logout()" class="canias-btn canias-btn-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i> Çıkış</button>
+  </div>
+</div>
+
+<!-- KAYAN CANLI BİLDİRİM BANNERI -->
+<div id="liveMarqueeBanner" class="bg-[#000080] text-yellow-300 px-2 py-1 border-b border-[#7f9db9] flex items-center text-xs overflow-hidden shadow-inner select-none">
+  <div class="flex items-center gap-1 font-bold bg-red-600 text-white px-2 py-0.5 rounded text-[10px] whitespace-nowrap flex-shrink-0 mr-2 z-10 shadow">
+    <i data-lucide="radio" class="w-3 h-3 animate-pulse"></i> CANLI SEVKİYAT AKIŞI
+  </div>
+  <div class="overflow-hidden whitespace-nowrap w-full relative flex items-center">
+    <div id="marqueeText" class="animate-marquee font-mono text-sm font-bold">
+      Yükleniyor...
+    </div>
+  </div>
+</div>
+
+<!-- KULLANICI DURUMLARI MODAL POPUP -->
+<section id="userStatusModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 hidden">
+  <div class="w-[420px] bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5">
+    <div class="bg-gradient-to-r from-[#000080] to-[#1084d0] text-white px-2 py-1 font-bold text-xs flex justify-between items-center">
+      <span class="flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5"></i> Kullanıcı Listesi</span>
+      <button onclick="toggleUserStatusModal()" class="text-white font-bold px-1 text-xs">&times;</button>
+    </div>
+    <div class="p-2 bg-[#f5f4ea] m-0.5 border border-[#7f9db9] space-y-1.5 max-h-[350px] overflow-y-auto">
+      <div id="userStatusBadges" class="flex flex-col gap-1.5"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ANLIK YAZIŞMA / SOHBET POPUP MODAL (Genel + Özel) -->
+<section id="chatModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+  <div class="w-[560px] h-[500px] bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5 flex flex-col">
+    <div class="bg-gradient-to-r from-[#000080] to-[#1084d0] text-white px-2 py-1 font-bold text-xs flex justify-between items-center">
+      <span class="flex items-center gap-1"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Anlık Yazışma (Genel / Özel)</span>
+      <button onclick="toggleChatModal()" class="text-white font-bold px-1 text-xs">&times;</button>
+    </div>
+    <div class="px-2 py-1.5 bg-[#f5f4ea] border-b border-[#7f9db9] flex items-center gap-2">
+      <label class="text-[10px] font-bold text-gray-700 whitespace-nowrap">Konuşma:</label>
+      <select id="chatTargetSelect" onchange="onChatTargetChange()" class="canias-select flex-grow text-xs font-bold">
+        <option value="ALL">📢 Herkese (Genel Sohbet)</option>
+      </select>
+    </div>
+    <div id="chatMessagesBox" class="p-2 bg-[#ffffff] m-0.5 border border-[#7f9db9] flex-grow overflow-y-auto space-y-2"></div>
+    <div id="chatTypingIndicator" class="hidden px-3 py-0.5 text-[10px] text-gray-500 italic bg-[#f5f4ea] border-t border-[#7f9db9]">Birisi yazıyor...</div>
+    <div class="p-1.5 bg-[#f5f4ea] border-t border-[#7f9db9] flex items-center gap-1">
+      <input id="chatInputMessage" class="canias-input flex-grow text-xs" placeholder="Mesajınızı yazınız..." onkeypress="if(event.key === 'Enter') sendChatMessage()" oninput="onChatTyping()">
+      <button onclick="sendChatMessage()" class="canias-btn canias-btn-success"><i data-lucide="send" class="w-3.5 h-3.5"></i> Gönder</button>
+    </div>
+  </div>
+</section>
+
+<!-- KLAVYE KISAYOLLARI MODAL -->
+<section id="shortcutsModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+  <div class="w-[420px] bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5">
+    <div class="bg-gradient-to-r from-[#000080] to-[#1084d0] text-white px-2 py-1 font-bold text-xs flex justify-between items-center">
+      <span class="flex items-center gap-1"><i data-lucide="keyboard" class="w-3.5 h-3.5"></i> Klavye Kısayolları</span>
+      <button onclick="toggleShortcutsModal()" class="text-white font-bold px-1 text-xs">&times;</button>
+    </div>
+    <div class="p-3 bg-[#f5f4ea] m-0.5 border border-[#7f9db9] text-xs space-y-1.5">
+      <div class="flex justify-between border-b border-gray-300 py-1"><span class="font-bold">Ctrl + S</span><span>Formu kaydet</span></div>
+      <div class="flex justify-between border-b border-gray-300 py-1"><span class="font-bold">Ctrl + F</span><span>Gelişmiş arama sekmesi</span></div>
+      <div class="flex justify-between border-b border-gray-300 py-1"><span class="font-bold">Ctrl + D</span><span>Dashboard</span></div>
+      <div class="flex justify-between border-b border-gray-300 py-1"><span class="font-bold">Ctrl + E</span><span>Sevkiyat girişi</span></div>
+      <div class="flex justify-between border-b border-gray-300 py-1"><span class="font-bold">Ctrl + K</span><span>Sohbet aç/kapa</span></div>
+      <div class="flex justify-between border-b border-gray-300 py-1"><span class="font-bold">Ctrl + Shift + T</span><span>Tema değiştir</span></div>
+      <div class="flex justify-between border-b border-gray-300 py-1"><span class="font-bold">?</span><span>Bu kısayol listesi</span></div>
+      <div class="flex justify-between py-1"><span class="font-bold">Esc</span><span>Açık modalı kapat</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- YAKIT SİSTEMLERİ EKSİK GÖNDERİM NEDENİ POPUP MODAL -->
+<section id="incompleteReasonModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+  <div class="w-[450px] bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5">
+    <div class="bg-gradient-to-r from-[#800000] to-[#d01010] text-white px-2 py-1 font-bold text-xs flex justify-between items-center">
+      <span class="flex items-center gap-1"><i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-300"></i> Eksik Gönderim Bildirimi</span>
+      <button onclick="closeIncompleteModal()" class="text-white font-bold px-1 text-xs">&times;</button>
+    </div>
+    <div class="p-3 bg-[#f5f4ea] m-0.5 border border-[#7f9db9] space-y-3">
+      <div class="p-2 bg-red-100 border border-red-400 text-red-900 rounded font-bold text-xs flex items-center gap-2">
+        <i data-lucide="info" class="w-5 h-5 flex-shrink-0 text-red-700"></i>
+        <span>Araç doluluğu tam olmadığı halde gönderim yapılıyor. Lütfen nedeni belirtiniz.</span>
+      </div>
+      <div>
+        <label class="block font-bold text-xs text-gray-800 mb-1">Neden Eksik Gönderiliyor?</label>
+        <textarea id="incompleteReasonInput" rows="3" class="canias-textarea w-full font-bold uppercase-input text-xs" placeholder="Eksik gönderim nedenini detaylıca yazınız..."></textarea>
+      </div>
+      <div class="flex justify-end gap-2 pt-1">
+        <button onclick="confirmIncompleteSubmit()" class="canias-btn canias-btn-success"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Onayla ve Gönder</button>
+        <button onclick="closeIncompleteModal()" class="canias-btn canias-btn-danger">İptal</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEFER DETAY MODALI -->
+<section id="tripDetailModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+  <div class="w-[720px] max-w-[96vw] bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5">
+    <div class="bg-gradient-to-r from-[#000080] to-[#1084d0] text-white px-2 py-1 font-bold text-xs flex justify-between items-center"><span class="flex items-center gap-1"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Sefer Detayı</span><button onclick="closeTripDetail()" class="text-white font-bold px-1 text-xs">&times;</button></div>
+    <div id="tripDetailBody" class="p-3 bg-[#f5f4ea] m-0.5 border border-[#7f9db9]"></div>
+  </div>
+</section>
+
+<!-- CONTAINER -->
+<div class="flex-grow p-1.5 overflow-auto bg-[#d4d0c8]">
+
+  <!-- AUTH SCREEN -->
+  <section id="authScreen" class="fixed inset-0 bg-[#008080]/10 flex items-center justify-center z-50">
+    <div class="w-[440px] bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5">
+      <div class="bg-gradient-to-r from-[#000080] to-[#1084d0] text-white px-2 py-1 font-bold text-xs flex justify-between items-center">
+        <span>Oturum Aç - BPO Lojistik Takip</span>
+        <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+      </div>
+      
+      <div class="p-3 bg-[#f5f4ea] m-0.5 border border-[#7f9db9] overflow-hidden">
+        <div class="flex items-center gap-3 mb-3 pb-2 border-b border-gray-300">
+          <div class="w-10 h-10 bg-[#000080] text-white font-black text-lg flex items-center justify-center rounded border border-black flex-shrink-0">
+            <i data-lucide="truck" class="w-6 h-6 text-white"></i>
+          </div>
+          <div class="truncate">
+            <div class="font-bold text-sm text-[#000080] truncate">BPO LOJİSTİK SEFER TAKİBİ</div>
+            <div class="text-[10px] text-gray-600 font-semibold truncate">Sevkiyat Operasyon Paneli</div>
+          </div>
+        </div>
+
+        <div class="flex border-b border-[#7f9db9] mb-3">
+          <button id="authTabLoginBtn" onclick="switchAuthMode('login')" class="px-3 py-1 font-bold text-xs bg-[#f5f4ea] border border-[#7f9db9] border-b-white -mb-px">Giriş Yap</button>
+          <button id="authTabRegisterBtn" onclick="switchAuthMode('register')" class="px-3 py-1 font-bold text-xs bg-[#d4d0c8] border border-[#7f9db9] text-gray-600">Kayıt Talebi</button>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 mb-1">Kullanıcı Kodu:</label>
+            <input id="loginUser" required class="canias-input w-full" placeholder="Kullanıcı Adı">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 mb-1">Parola:</label>
+            <input id="loginPass" type="password" required class="canias-input w-full" placeholder="*****">
+          </div>
+          <div id="loginError" class="hidden text-red-700 font-bold text-[10px] p-1 bg-red-100 border border-red-400">
+            Hata: Kullanıcı adı veya parola geçersiz!
+          </div>
+          <div id="loginPendingError" class="hidden text-orange-800 font-bold text-[10px] p-1 bg-orange-100 border border-orange-400">
+            Bilgi: Onay bekleniyor.
+          </div>
+          <div id="loginRejectedError" class="hidden text-red-800 font-bold text-[10px] p-1 bg-red-100 border border-red-400">
+            Hata: Üyelik talebiniz reddedildi.
+          </div>
+          <div class="pt-1">
+            <button type="submit" class="canias-btn w-full justify-center py-2 text-xs"><i data-lucide="key" class="w-3.5 h-3.5"></i> Oturum Aç</button>
+          </div>
+        </form>
+
+        <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-2 hidden">
+          <div><label class="block text-[10px] font-bold">Ad Soyad *</label><input id="regName" required class="canias-input w-full"></div>
+          <div><label class="block text-[10px] font-bold">Telefon *</label><input id="regPhone" required class="canias-input w-full"></div>
+          <div><label class="block text-[10px] font-bold">E-Posta</label><input id="regEmail" type="email" class="canias-input w-full"></div>
+          <div>
+            <label class="block text-[10px] font-bold">Tesis *</label>
+            <select id="regFacility" required class="canias-select w-full">
+              <option value="Panayır">Panayır</option>
+              <option value="Yakıt Sistemleri">Yakıt Sistemleri</option>
+            </select>
+          </div>
+          <div><label class="block text-[10px] font-bold">Kullanıcı Adı *</label><input id="regUser" required class="canias-input w-full"></div>
+          <div><label class="block text-[10px] font-bold">Parola *</label><input id="regPass" required type="password" class="canias-input w-full"></div>
+          <button type="submit" class="canias-btn w-full justify-center py-1.5 mt-1">Talep Gönder</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FACILITY SELECTION DIALOG -->
+  <section id="facilitySelectionScreen" class="fixed inset-0 bg-black/30 flex items-center justify-center z-40 hidden">
+    <div class="w-80 bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5">
+      <div class="bg-gradient-to-r from-[#000080] to-[#1084d0] text-white px-2 py-1 font-bold text-xs">
+        Tesis Seçimi
+      </div>
+      <div class="p-3 bg-[#f5f4ea] m-0.5 border border-[#7f9db9] text-center">
+        <p class="font-bold text-xs mb-2 text-gray-800">Çalışılacak Tesis:</p>
+        <div class="grid grid-cols-1 gap-2">
+          <button id="facilityBtnPanayir" onclick="selectFacility('Panayır')" class="canias-btn justify-center py-2 text-xs"><i data-lucide="factory" class="w-3.5 h-3.5 text-[#000080]"></i> PANAYIR TESİSİ</button>
+          <button id="facilityBtnYakit" onclick="selectFacility('Yakıt Sistemleri')" class="canias-btn justify-center py-2 text-xs"><i data-lucide="fuel" class="w-3.5 h-3.5 text-orange-700"></i> YAKIT SİSTEMLERİ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXCEL / CLIPBOARD PASTE DIALOG -->
+  <section id="excelPasteModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 hidden">
+    <div class="w-[550px] bg-[#ece9d8] border-2 border-white border-r-[#404040] border-b-[#404040] shadow-2xl p-0.5">
+      <div class="bg-gradient-to-r from-[#000080] to-[#1084d0] text-white px-2 py-1 font-bold text-xs flex justify-between items-center">
+        <span>Excel Verisi Yapıştır</span>
+        <button onclick="closeExcelModal()" class="text-white font-bold px-1">&times;</button>
+      </div>
+      <div class="p-2 bg-[#f5f4ea] m-0.5 border border-[#7f9db9] space-y-2">
+        <p class="text-[10px] text-gray-700 font-bold">
+          Sırasıyla yapıştırın (Ctrl+V): <span class="text-[#000080]">İrsaliyeNo | Nakliye | Plaka | AraçTipi | Çıkış | Varış | Şoför | Notlar</span>
+        </p>
+        <textarea id="excelPasteInput" rows="6" class="canias-textarea w-full font-mono text-[10px]" placeholder="IRS2026-01	HSG	16ABC123	TIR	FABRIKA	DEPO	AHMET	OK"></textarea>
+        <div class="flex justify-end gap-1.5">
+          <button onclick="processExcelPaste()" class="canias-btn"><i data-lucide="file-check" class="w-3.5 h-3.5 text-green-700"></i> Aktar</button>
+          <button onclick="closeExcelModal()" class="canias-btn canias-btn-danger">İptal</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN WORKSPACE -->
+  <main id="mainApp" class="hidden space-y-2">
+
+    <!-- KPI BAR -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-1.5">
+      <div class="bg-[#f5f4ea] border border-[#7f9db9] p-2 flex justify-between items-center shadow-sm">
+        <div>
+          <span class="text-[9px] font-bold text-gray-600 uppercase block">Toplam Sefer</span>
+          <span id="kpiTotalTrips" class="text-xl font-bold text-[#000080]">0</span>
+        </div>
+        <i data-lucide="truck" class="w-6 h-6 text-[#000080]"></i>
+      </div>
+
+      <div class="bg-[#f5f4ea] border border-[#7f9db9] p-2 flex justify-between items-center shadow-sm">
+        <div>
+          <span class="text-[9px] font-bold text-gray-600 uppercase block">Günlük Sefer</span>
+          <span id="kpiTodayTrips" class="text-xl font-bold text-purple-900">0</span>
+        </div>
+        <i data-lucide="calendar" class="w-6 h-6 text-purple-800"></i>
+      </div>
+
+      <div class="bg-[#f5f4ea] border border-[#7f9db9] p-2 flex justify-between items-center shadow-sm">
+        <div>
+          <span class="text-[9px] font-bold text-gray-600 uppercase block">Ortalama Araç</span>
+          <span id="kpiDailyAvg" class="text-xl font-bold text-green-800">0</span>
+        </div>
+        <i data-lucide="activity" class="w-6 h-6 text-green-800"></i>
+      </div>
+    </div>
+
+    <!-- TAB 1: ENTRY & QUICK GRID -->
+    <div id="tabEntry" class="bg-[#f5f4ea] border border-[#7f9db9] p-2.5 space-y-3">
+      <div class="canias-groupbox">
+        <div class="flex justify-between items-center mb-1">
+          <span class="canias-groupbox-title">Sevkiyat Giriş Formu</span>
+          <span id="adminDragNotice" class="text-[9px] text-[#000080] font-bold bg-blue-100 px-1.5 py-0.5 rounded border border-blue-300 hidden">
+            <i data-lucide="move" class="w-3 h-3 inline"></i> Admin: Sürükle-Bırak Aktif
+          </span>
+        </div>
+        
+        <form onsubmit="handleFormSubmit(event)">
+          <input type="hidden" id="editRecordId">
+          
+          <div id="formFieldsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 py-2">
+            
+            <div id="field_irsaliye" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">İrsaliye No *</label>
+              <input id="inputIrsaliyeNo" required class="canias-input w-full uppercase-input font-bold text-sm" placeholder="IRS2026...">
+            </div>
+
+            <div id="field_plaka" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">Plaka *</label>
+              <input id="inputPlaka" required class="canias-input w-full uppercase-input font-bold text-sm" placeholder="16 BPO 16">
+            </div>
+
+            <div id="field_nakliye" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">Nakliye Firması</label>
+              <input id="inputNakliye" class="canias-input w-full uppercase-input" placeholder="Lojistik Firması">
+            </div>
+
+            <div id="field_sofor" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">Şoför İsmi</label>
+              <input id="inputSoforIsmi" class="canias-input w-full uppercase-input" placeholder="Ad Soyad">
+            </div>
+
+            <div id="field_aracTipi" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">Araç Tipi</label>
+              <select id="inputAracTipi" onchange="calculateDoluluk()" class="canias-select w-full font-semibold">
+                <option value="TIR">TIR</option>
+                <option value="KAMYON">KAMYON</option>
+                <option value="KAMYONET">KAMYONET</option>
+                <option value="PANELVAN">PANELVAN</option>
+                <option value="DİĞER">DİĞER</option>
+              </select>
+            </div>
+
+            <div id="field_sehpa" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative hidden shadow-sm">
+              <label class="block font-bold text-[11px] text-[#000080] mb-1">Sehpa Miktarı</label>
+              <div class="flex items-center gap-1.5">
+                <input id="inputSehpaMiktari" type="number" min="0" oninput="calculateDoluluk()" class="canias-input w-full font-bold text-sm" placeholder="0">
+                <button type="button" onclick="setSehpaFull()" class="canias-btn canias-btn-success whitespace-nowrap" title="Tam dolu (16 sehpa)"><i data-lucide="package-check" class="w-3.5 h-3.5"></i> Tam Dolu</button>
+                <div id="dolulukBox" class="hidden px-2 py-1.5 rounded font-bold text-xs whitespace-nowrap border">
+                  %0
+                </div>
+              </div>
+            </div>
+
+            <div id="field_cikis" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">Çıkış Lokasyonu</label>
+              <input id="inputCikis" class="canias-input w-full uppercase-input" placeholder="Çıkış Yeri">
+            </div>
+
+            <div id="field_varis" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">Varış Lokasyonu</label>
+              <input id="inputVaris" class="canias-input w-full uppercase-input" placeholder="Varış Yeri">
+            </div>
+
+            <div id="field_notlar" class="draggable-item bg-white p-2 border border-[#7f9db9] rounded relative shadow-sm col-span-1 md:col-span-2 lg:col-span-4">
+              <label class="block font-bold text-[11px] text-gray-800 mb-1">Notlar</label>
+              <input id="inputNotlar" class="canias-input w-full uppercase-input" placeholder="Not...">
+            </div>
+
+          </div>
+
+          <div class="mt-3 pt-2 border-t border-gray-300 flex items-center gap-2">
+            <button id="submitBtn" type="submit" class="canias-btn canias-btn-lg">
+              <i data-lucide="save" class="w-4 h-4 text-[#000080]"></i> 
+              <span id="submitBtnText" class="font-bold">KAYDET</span>
+            </button>
+            <button type="button" onclick="openExcelModal()" class="canias-btn canias-btn-lg">
+              <i data-lucide="clipboard" class="w-4 h-4 text-purple-700"></i> 
+              <span class="font-bold">EXCEL'DEN YAPIŞTIR</span>
+            </button>
+            <button type="button" id="cancelEditBtn" onclick="cancelEdit()" class="canias-btn canias-btn-lg canias-btn-danger hidden">İptal</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="canias-groupbox">
+        <div class="flex justify-between items-center">
+          <span class="canias-groupbox-title">Son Kaydedilen Hareketler</span>
+          <span id="quickTableCount" class="text-[10px] font-bold text-[#000080] bg-blue-100 px-2 py-0.5 rounded border border-blue-300">0 kayıt</span>
+        </div>
+        <div class="overflow-x-auto mt-1">
+          <table class="canias-grid">
+            <thead>
+              <tr id="quickTableHeaderRow">
+                <th>S.No</th><th>Tarih</th><th>Saat</th><th>İrsaliye No</th><th>Nakliye</th><th>Plaka</th><th>Araç</th><th>Çıkış</th><th>Varış</th><th>Yüklenen Sehpa Miktarı</th><th>Şoför</th><th>İşlem</th><th>Not</th>
+              </tr>
+            </thead>
+            <tbody id="quickTableBody"></tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <div class="flex items-center gap-1">
+            <button onclick="changeQuickPage('prev')" class="canias-btn" title="Önceki"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+            <span id="quickPageIndicator" class="text-xs font-bold text-gray-700 px-2">Sayfa 1 / 1</span>
+            <button onclick="changeQuickPage('next')" class="canias-btn" title="Sonraki"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-[10px] font-bold text-gray-600">Satır:</label>
+            <select id="quickRowsPerPage" class="canias-select text-xs" onchange="onQuickRowsChange()">
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: GELİŞMİŞ ARAMA EKRANI -->
+    <div id="tabSearch" class="bg-[#f5f4ea] border border-[#7f9db9] p-2 space-y-2 hidden">
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title">Gelişmiş Sefer Arama & Filtreleme</span>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 my-2">
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">İrsaliye No</label>
+            <input id="searchIrsaliye" class="canias-input w-full uppercase-input font-bold text-xs" placeholder="IRS..." oninput="debouncedAdvancedSearch()">
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Plaka</label>
+            <input id="searchPlaka" class="canias-input w-full uppercase-input font-bold text-xs" placeholder="16..." oninput="debouncedAdvancedSearch()">
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Şoför</label>
+            <input id="searchSofor" class="canias-input w-full uppercase-input text-xs" placeholder="Ad Soyad" oninput="debouncedAdvancedSearch()">
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Nakliye Firması</label>
+            <input id="searchNakliye" class="canias-input w-full uppercase-input text-xs" placeholder="Firma" oninput="debouncedAdvancedSearch()">
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Araç Tipi</label>
+            <select id="searchAracTipi" class="canias-select w-full text-xs" onchange="executeAdvancedSearch()">
+              <option value="">Tümü</option>
+              <option value="TIR">TIR</option>
+              <option value="KAMYON">KAMYON</option>
+              <option value="KAMYONET">KAMYONET</option>
+              <option value="PANELVAN">PANELVAN</option>
+              <option value="DİĞER">DİĞER</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Tesis</label>
+            <select id="searchTesis" class="canias-select w-full text-xs" onchange="executeAdvancedSearch()">
+              <option value="HEPSİ">Tümü</option>
+              <option value="Panayır">Panayır</option>
+              <option value="Yakıt Sistemleri">Yakıt Sistemleri</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Başlangıç Tarihi</label>
+            <input id="startDate" type="date" class="canias-input w-full text-xs" onchange="executeAdvancedSearch()">
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Bitiş Tarihi</label>
+            <input id="endDate" type="date" class="canias-input w-full text-xs" onchange="executeAdvancedSearch()">
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Çıkış Lokasyonu</label>
+            <input id="searchCikis" class="canias-input w-full uppercase-input text-xs" placeholder="Çıkış" oninput="debouncedAdvancedSearch()">
+          </div>
+          <div>
+            <label class="block font-bold text-[10px] text-gray-700 mb-0.5">Varış Lokasyonu</label>
+            <input id="searchVaris" class="canias-input w-full uppercase-input text-xs" placeholder="Varış" oninput="debouncedAdvancedSearch()">
+          </div>
+          <div class="flex items-end gap-1 col-span-2">
+            <button onclick="executeAdvancedSearch()" class="canias-btn"><i data-lucide="search" class="w-3.5 h-3.5 text-[#000080]"></i> Sorgula</button>
+            <button onclick="resetFilter()" class="canias-btn canias-btn-danger"><i data-lucide="x" class="w-3.5 h-3.5"></i> Temizle</button>
+            <button onclick="exportSearchToExcel()" class="canias-btn canias-btn-success" title="Sonuçları Excel'e Aktar"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-green-800"></i> Excel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hızlı İrsaliye Kart Arama (eski özellik korundu) -->
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title">Hızlı İrsaliye Kartı</span>
+        <div class="flex items-center gap-2 my-1">
+          <input id="irsaliyeSearchInput" class="canias-input w-72 uppercase-input font-bold" placeholder="İrsaliye Numarası Giriniz..." onkeypress="if(event.key==='Enter')executeIrsaliyeSearch()">
+          <button onclick="executeIrsaliyeSearch()" class="canias-btn"><i data-lucide="search" class="w-3.5 h-3.5 text-[#000080]"></i> Kart Göster</button>
+        </div>
+        <div id="irsaliyeResultContainer" class="hidden mt-2">
+          <div id="irsaliyeCardContent" class="p-2 space-y-2"></div>
+        </div>
+      </div>
+
+      <div class="canias-groupbox">
+        <div class="flex justify-between items-center mb-1">
+          <span class="canias-groupbox-title">Arama Sonuçları</span>
+          <span id="searchResultCount" class="text-[10px] font-bold text-[#000080] bg-blue-100 px-2 py-0.5 rounded border border-blue-300">0 kayıt</span>
+        </div>
+        <div class="overflow-x-auto mt-1">
+          <table class="canias-grid">
+            <thead>
+              <tr>
+                <th>#</th><th>Tarih</th><th>Saat</th><th>İrsaliye No</th><th>Nakliye</th><th>Plaka</th><th>Araç</th><th>Çıkış</th><th>Varış</th><th>Sehpa</th><th>Şoför</th><th>Tesis</th><th>İşlem</th><th>Not</th>
+              </tr>
+            </thead>
+            <tbody id="kpiTableBody"></tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <div class="flex items-center gap-1">
+            <button onclick="changePage('prev')" class="canias-btn" title="Önceki"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+            <span id="pageIndicator" class="text-xs font-bold text-gray-700 px-2">Sayfa 1 / 1</span>
+            <button onclick="changePage('next')" class="canias-btn" title="Sonraki"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-[10px] font-bold text-gray-600">Satır:</label>
+            <select id="searchRowsPerPage" class="canias-select text-xs" onchange="onSearchRowsChange()">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB DASHBOARD: GRAFİKLER -->
+    <div id="tabDashboard" class="bg-[#f5f4ea] border border-[#7f9db9] p-2 space-y-3 hidden">
+      <div class="canias-groupbox">
+        <div class="flex justify-between items-center mb-1"><span class="canias-groupbox-title">Operasyon Özeti</span><span id="dashboardUpdatedAt" class="text-[9px] font-bold text-gray-500">Son hesaplama: --:--:--</span></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div class="bg-white border border-[#7f9db9] rounded p-2"><div class="text-[9px] font-bold text-gray-600">BUGÜN / SAAT</div><div id="dashTodayPerHour" class="text-lg font-black text-[#000080]">0.0</div></div>
+          <div class="bg-white border border-[#7f9db9] rounded p-2"><div class="text-[9px] font-bold text-gray-600">SON 24 SAAT</div><div id="dashLast24" class="text-lg font-black text-green-800">0</div></div>
+          <div class="bg-white border border-[#7f9db9] rounded p-2"><div class="text-[9px] font-bold text-gray-600">EN YOĞUN SAAT</div><div id="dashPeakHour" class="text-lg font-black text-orange-800">-</div></div>
+          <div class="bg-white border border-[#7f9db9] rounded p-2"><div class="text-[9px] font-bold text-gray-600">AKTİF NAKLİYE</div><div id="dashActiveCarriers" class="text-lg font-black text-purple-900">0</div></div>
+        </div>
+      </div>
+      <div class="canias-groupbox">
+        <div class="flex justify-between items-center mb-1"><span class="canias-groupbox-title">Canlı Operasyon / Son Hareketler</span><button onclick="switchTab('entry')" class="canias-btn"><i data-lucide="plus" class="w-3 h-3"></i> Yeni Sefer</button></div>
+        <div id="liveOperationsPanel" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2"></div>
+      </div>
+      
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title">Operasyon Dashboard</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+          <div class="bg-white border border-[#7f9db9] rounded p-2">
+            <div class="font-bold text-xs text-[#000080] mb-1 flex items-center gap-1"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> Son 14 Gün Sefer Sayısı</div>
+            <canvas id="chartDailyTrips" height="110"></canvas>
+          </div>
+          <div class="bg-white border border-[#7f9db9] rounded p-2">
+            <div class="font-bold text-xs text-[#000080] mb-1 flex items-center gap-1"><i data-lucide="building-2" class="w-3.5 h-3.5"></i> Tesis Dağılımı</div>
+            <canvas id="chartFacility" height="110"></canvas>
+          </div>
+          <div class="bg-white border border-[#7f9db9] rounded p-2">
+            <div class="font-bold text-xs text-[#000080] mb-1 flex items-center gap-1"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Araç Tipi Dağılımı</div>
+            <canvas id="chartVehicleType" height="180"></canvas>
+          </div>
+          <div class="bg-white border border-[#7f9db9] rounded p-2">
+            <div class="font-bold text-xs text-[#000080] mb-1 flex items-center gap-1"><i data-lucide="warehouse" class="w-3.5 h-3.5"></i> Nakliye Firması (Top 6)</div>
+            <canvas id="chartNakliye" height="180"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ADMIN & USER MANAGEMENT -->
+    <div id="tabAdmin" class="bg-[#f5f4ea] border border-[#7f9db9] p-2 space-y-3 hidden">
+      <div class="canias-groupbox bg-red-50 border-red-300">
+        <span class="canias-groupbox-title text-red-900">Sistem Yönetimi & Özel Admin Yetkileri</span>
+        <div class="flex items-center justify-between gap-2 p-1 flex-wrap">
+          <div class="flex items-center gap-2">
+            <button onclick="adminClearCurrentFacilityData()" class="canias-btn canias-btn-danger">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Aktif Tesis Verilerini Temizle
+            </button>
+            <button onclick="adminResetAllToDefault()" class="canias-btn canias-btn-danger">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Veritabanını Fabrika Ayarlarına Döndür
+            </button>
+          </div>
+          <span class="text-[10px] text-gray-600 font-bold">* Admin Yetkisi: Veri silme ve sistem kısıtlamalarını yönetme paneli.</span>
+        </div>
+      </div>
+
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title">Plaka Tanımları Yönetimi</span>
+        <div class="flex items-center gap-2 mb-2">
+          <input id="adminNewPlakaInput" class="canias-input uppercase-input font-bold w-48" placeholder="Örn: 16 BPO 99">
+          <button onclick="adminAddPlaka()" class="canias-btn canias-btn-success"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Plaka Ekle</button>
+        </div>
+        <div id="adminPlakaList" class="flex flex-wrap gap-1.5 p-2 bg-white border border-[#7f9db9] rounded max-h-28 overflow-y-auto"></div>
+      </div>
+
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title text-orange-900">Bekleyen Üyelik Talepleri</span>
+        <div class="overflow-x-auto mt-1">
+          <table class="canias-grid">
+            <thead>
+              <tr>
+                <th>Ad Soyad</th><th>Kullanıcı Adı</th><th>Telefon</th><th>E-Posta</th><th>Tesis</th><th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="pendingUserTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title">Yeni Kullanıcı Tanımlama</span>
+        <form onsubmit="handleAdminCreateUser(event)" class="grid grid-cols-3 gap-2">
+          <div><label class="block font-bold">Ad Soyad *</label><input id="adminCreateName" required class="canias-input w-full"></div>
+          <div><label class="block font-bold">Kullanıcı Kodu *</label><input id="adminCreateUser" required class="canias-input w-full"></div>
+          <div><label class="block font-bold">Parola *</label><input id="adminCreatePass" required type="password" class="canias-input w-full"></div>
+          <div><label class="block font-bold">Telefon</label><input id="adminCreatePhone" class="canias-input w-full"></div>
+          <div><label class="block font-bold">E-Posta</label><input id="adminCreateEmail" type="email" class="canias-input w-full"></div>
+          <div>
+            <label class="block font-bold">Rol *</label>
+            <select id="adminCreateRole" class="canias-select w-full">
+              <option value="Arka Sevkiyat">Arka Sevkiyat</option>
+              <option value="Ön Sevkiyat">Ön Sevkiyat</option>
+              <option value="Yakıt Sistemleri">Yakıt Sistemleri</option>
+              <option value="Sevkiyat Sorumlusu">Sevkiyat Sorumlusu</option>
+              <option value="admin">Sistem Yöneticisi (Admin)</option>
+            </select>
+          </div>
+          <div class="col-span-3">
+            <button type="submit" class="canias-btn"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Oluştur</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title">Kullanıcı Yetkilendirme</span>
+        <div class="overflow-x-auto mt-1">
+          <table class="canias-grid">
+            <thead>
+              <tr>
+                <th>Ad Soyad</th><th>Kullanıcı Adı</th><th>Telefon</th><th>E-Posta</th><th>Tesis</th><th>Durum</th><th>Rol</th><th>Parola</th><th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: FİRMA İLE TEYİTLEŞME -->
+    <div id="tabTeyit" class="bg-[#f5f4ea] border border-[#7f9db9] p-2 space-y-3 hidden">
+      <div class="canias-groupbox">
+        <span class="canias-groupbox-title text-green-900">Firma ile Teyitleşme ve Tesis Dağılımı</span>
+        
+        <div class="flex items-center justify-between gap-4 my-1 flex-wrap">
+          <div class="flex items-center gap-2 bg-white p-1.5 border border-[#7f9db9] rounded">
+            <span class="font-bold text-xs text-gray-800">Başlangıç:</span>
+            <input id="teyitStartDate" type="date" oninput="debouncedTeyitRender()" class="canias-input font-bold text-xs">
+            <span class="font-bold text-xs text-gray-800">Bitiş:</span>
+            <input id="teyitEndDate" type="date" oninput="debouncedTeyitRender()" class="canias-input font-bold text-xs">
+            <select id="teyitCompanyFilter" onchange="renderTeyitSection()" class="canias-select text-xs font-bold min-w-[180px]"><option value="ALL">Tüm Firmalar</option></select>
+            <button onclick="renderTeyitSection()" class="canias-btn"><i data-lucide="filter" class="w-3.5 h-3.5 text-[#000080]"></i> Filtrele</button>
+            <button onclick="exportTeyitToExcel()" class="canias-btn canias-btn-success" title="Teyit Verilerini Excel'e Aktar">
+              <i data-lucide="file-spread-sheet" class="w-3.5 h-3.5 text-green-800"></i> Excel'e Aktar
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="bg-white border border-[#7f9db9] p-1.5 rounded flex items-center gap-2 min-w-[110px]">
+              <i data-lucide="truck" class="w-4 h-4 text-[#000080]"></i>
+              <div>
+                <span class="text-[9px] font-bold text-gray-600 block uppercase">Toplam Sefer</span>
+                <span id="teyitTotalVehicles" class="text-lg font-bold text-[#000080]">0</span>
+              </div>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-300 p-1.5 rounded flex items-center gap-2 min-w-[100px]">
+              <i data-lucide="building" class="w-4 h-4 text-blue-800"></i>
+              <div>
+                <span class="text-[9px] font-bold text-blue-900 block uppercase">OSB</span>
+                <span id="teyitOsbCount" class="text-lg font-bold text-blue-800">0</span>
+              </div>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-300 p-1.5 rounded flex items-center gap-2 min-w-[100px]">
+              <i data-lucide="fuel" class="w-4 h-4 text-orange-800"></i>
+              <div>
+                <span class="text-[9px] font-bold text-orange-900 block uppercase">Yakıt</span>
+                <span id="teyitYakitCount" class="text-lg font-bold text-orange-800">0</span>
+              </div>
+            </div>
+
+            <div class="bg-yellow-50 border border-yellow-400 p-1.5 rounded flex items-center gap-2 min-w-[100px]">
+              <i data-lucide="car" class="w-4 h-4 text-yellow-800"></i>
+              <div>
+                <span class="text-[9px] font-bold text-yellow-900 block uppercase">Renault</span>
+                <span id="teyitRenaultCount" class="text-lg font-bold text-yellow-800">0</span>
+              </div>
+            </div>
+
+            <div class="bg-green-50 border border-green-300 p-1.5 rounded flex items-center gap-2 min-w-[100px]">
+              <i data-lucide="bus" class="w-4 h-4 text-green-800"></i>
+              <div>
+                <span class="text-[9px] font-bold text-green-900 block uppercase">Karsan</span>
+                <span id="teyitKarsanCount" class="text-lg font-bold text-green-800">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="canias-groupbox">
+        <div class="flex justify-between items-center">
+          <span class="canias-groupbox-title">Teyitleşme Sefer Listesi</span>
+          <span id="teyitListCount" class="text-[10px] font-bold text-[#000080] bg-blue-100 px-2 py-0.5 rounded border border-blue-300">0 kayıt</span>
+        </div>
+        <div class="overflow-x-auto mt-1">
+          <table class="canias-grid">
+            <thead>
+              <tr id="teyitTableHeaderRow">
+                <th>#</th><th>Tarih</th><th>Firma</th><th>Saat</th><th>İrsaliye No</th><th>Plaka</th><th>Araç Tipi</th><th>Çıkış</th><th>Varış</th><th>Şoför</th><th>Notlar</th>
+              </tr>
+            </thead>
+            <tbody id="teyitTableBody"></tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <div class="flex items-center gap-1">
+            <button onclick="changeTeyitPage('prev')" class="canias-btn" title="Önceki"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+            <span id="teyitPageIndicator" class="text-xs font-bold text-gray-700 px-2">Sayfa 1 / 1</span>
+            <button onclick="changeTeyitPage('next')" class="canias-btn" title="Sonraki"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-[10px] font-bold text-gray-600">Satır:</label>
+            <select id="teyitRowsPerPage" class="canias-select text-xs" onchange="onTeyitRowsChange()">
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- STATUS BAR -->
+<footer class="bg-[#ece9d8] border-t border-[#7f9db9] px-2 py-0.5 text-[9px] flex justify-between items-center text-gray-700 select-none">
+  <div><strong>BPO LOJİSTİK SEFER TAKİBİ</strong> - Lojistik Modülü</div>
+  <div>© 2026 BPO Plastic Omnium. Tüm hakları saklıdır.</div>
+</footer>
+
+<script>
+let currentUser = null;
+let currentFacility = localStorage.getItem("bpo_selected_facility") || "Panayır";
+let dataset = [];
+let usersList = [];
+let allowedPlakalar = [];
+let chatMessages = [];
+let auditLog = [];
+let activeData = [];
+let currentPage = 1;
+let rowsPerPage = 10;
+let quickPage = 1;
+let quickRowsPerPage = 10;
+let teyitPage = 1;
+let teyitRowsPerPage = 25;
+let lastSearchResults = [];
+let lastTeyitResults = [];
+let searchDebounceTimer = null;
+let userHeartbeatInterval = null;
+let sessionTimeoutInterval = null;
+let teyitDebounceTimer = null;
+let lastChatCount = 0;
+let formDirty = false;
+let chatTarget = "ALL";
+let chartDaily = null, chartFacility = null, chartVehicle = null, chartNakliye = null;
+const APP_VERSION = "2.5.0";
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+let lastActivityTime = Date.now();
+const PASSWORD_SALT = "BPO_LOJISTIK_2026_SALT_v1";
+let chatTypingTimer = null;
+let lastTypingBroadcast = 0;
+const PLAKA_REGEX = /^(0[1-9]|[1-7][0-9]|8[01])\s?[A-ZÇĞİÖŞÜ]{1,3}\s?\d{2,5}$/i;
+const PHONE_REGEX = /^(05\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
+
+/* ═══════════════════════════════════════════════════════════════
+   VERİ KATMANI — LOCAL STORAGE
+   Yerel veri katmanı.
+   ═══════════════════════════════════════════════════════════════ */
+function updateModeBadge() {}
+function requireRole(allowedRoles, actionLabel = "bu işlem") {
+    if (!currentUser) { alert("Oturum gerekli."); return false; }
+    const role = currentUser.role || "";
+    const isAdmin = role === "admin" || role === "Sistem Yöneticisi (Admin)";
+    if (allowedRoles.includes("admin") && isAdmin) return true;
+    if (allowedRoles.some(r => r === role)) return true;
+    alert(`Yetkisiz işlem: ${actionLabel}\nGerekli rol: ${allowedRoles.join(" / ")}\nSizin rolünüz: ${role}`);
+    addAudit("YETKİ_RED", `${actionLabel} · rol=${role}`);
+    return false;
+}
+function requireAdmin(actionLabel) { return requireRole(["admin"], actionLabel); }
+const BackendLocal = {
+    async loadAll() {
+        try {
+            const storedPlakalar = localStorage.getItem("bpo_plakalar");
+            allowedPlakalar = storedPlakalar ? JSON.parse(storedPlakalar) : [...initialPlakalar];
+            const storedData = localStorage.getItem("bpo_dataset");
+            dataset = storedData ? JSON.parse(storedData) : [];
+            const storedUsers = localStorage.getItem("bpo_users");
+            if (storedUsers) {
+                try { usersList = JSON.parse(storedUsers); if (!usersList.some(u => u.username === "admin")) usersList = JSON.parse(JSON.stringify(initialUsers)); }
+                catch (e) { usersList = JSON.parse(JSON.stringify(initialUsers)); }
+            } else usersList = JSON.parse(JSON.stringify(initialUsers));
+            const storedChat = localStorage.getItem("bpo_chat_messages");
+            if (storedChat) { chatMessages = JSON.parse(storedChat); lastChatCount = chatMessages.length; }
+            const storedAudit = localStorage.getItem("bpo_audit");
+            if (storedAudit) { try { auditLog = JSON.parse(storedAudit); } catch (e) { auditLog = []; } }
+        } catch (e) {
+            console.error("Yerel veri yükleme hatası:", e);
+            dataset = []; usersList = JSON.parse(JSON.stringify(initialUsers)); allowedPlakalar = [...initialPlakalar];
+        }
+        return true;
+    },
+    async saveTrips() { try { localStorage.setItem("bpo_dataset", JSON.stringify(dataset)); } catch (e) { alert("Depolama hatası!"); } return true; },
+    async upsertTrip() { try { localStorage.setItem("bpo_dataset", JSON.stringify(dataset)); } catch (e) { showToast("Yerel kayıt hatası."); return false; } return true; },
+    async deleteTrip() { try { localStorage.setItem("bpo_dataset", JSON.stringify(dataset)); } catch (e) { return false; } return true; },
+    async saveUsers() { try { localStorage.setItem("bpo_users", JSON.stringify(usersList)); } catch (e) {} return true; },
+    async savePlakalar() { try { localStorage.setItem("bpo_plakalar", JSON.stringify(allowedPlakalar)); } catch (e) {} return true; },
+    async saveChat() { try { localStorage.setItem("bpo_chat_messages", JSON.stringify(chatMessages)); } catch (e) {} return true; },
+    async saveAudit() { try { localStorage.setItem("bpo_audit", JSON.stringify(auditLog)); } catch (e) {} return true; },
+    async persistAll() {
+        try {
+            localStorage.setItem("bpo_dataset", JSON.stringify(dataset));
+            localStorage.setItem("bpo_users", JSON.stringify(usersList));
+            localStorage.setItem("bpo_selected_facility", currentFacility);
+            localStorage.setItem("bpo_plakalar", JSON.stringify(allowedPlakalar));
+            localStorage.setItem("bpo_chat_messages", JSON.stringify(chatMessages));
+            localStorage.setItem("bpo_audit", JSON.stringify(auditLog));
+        } catch (e) { alert("Depolama Hatası! Tarayıcı kotası dolmuş olabilir."); }
+    },
+    subscribeRealtime() {},
+    _broadcast(topic) {
+        try { if (typeof BroadcastChannel !== "undefined") { const bc = new BroadcastChannel("bpo-sync"); bc.postMessage({ topic, at: Date.now() }); bc.close(); } } catch (e) {}
+    }
+};
+
+function saveToLocalStorage() {
+    // Geriye uyumluluk: tüm eski çağrılar Backend.persistAll kullanır
+    Backend.persistAll();
+}
+
+const initialUsers = [
+    { username: "admin", pass: "admin", name: "Sistem Yöneticisi", phone: "0500 000 00 00", email: "admin@bpo.com", role: "admin", facility: "Tüm Tesisler", status: "approved", lastSeen: Date.now() },
+    { username: "sevkiyat", pass: "sevkiyat", name: "Sevkiyat Sorumlusu", phone: "0500 000 00 01", email: "sevkiyat@bpo.com", role: "Sevkiyat Sorumlusu", facility: "Panayır", status: "approved", lastSeen: 0 },
+    { username: "yakitsistemleri", pass: "yakit123", name: "Yakıt Sistemleri Operatörü", phone: "0500 000 00 02", email: "yakit@bpo.com", role: "Yakıt Sistemleri", facility: "Yakıt Sistemleri", status: "approved", lastSeen: 0 }
+];
+
+const initialPlakalar = ["16AJU132", "16YC393", "16BPO01", "16BPO02", "16BPO03", "16RH890", "16M9012", "16K7743", "16AAB123", "16XYZ99"];
+
+async function hashPassword(plainPassword) {
+    if (!plainPassword) return "";
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(String(plainPassword) + PASSWORD_SALT);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+    } catch (err) {
+        return "FALLBACK_" + btoa(unescape(encodeURIComponent(String(plainPassword) + PASSWORD_SALT))).slice(0, 64);
+    }
+}
+
+function isHashedPassword(pass) {
+    return typeof pass === "string" && /^[0-9a-f]{64}$/i.test(pass);
+}
+
+async function migrateUsersToHashedPasswords() {
+    let changed = false;
+    for (const u of usersList) {
+        if (u.pass && !isHashedPassword(u.pass)) {
+            u.pass = await hashPassword(u.pass);
+            changed = true;
+        }
+    }
+    if (changed) saveToLocalStorage();
+}
+
+function addAudit(action, detail = "") {
+    auditLog.unshift({
+        id: generateUUID(),
+        time: new Date().toLocaleString("tr-TR"),
+        user: currentUser ? currentUser.username : "sistem",
+        name: currentUser ? currentUser.name : "Sistem",
+        action, detail: String(detail).slice(0, 200), tesis: currentFacility || "-"
+    });
+    if (auditLog.length > 500) auditLog = auditLog.slice(0, 500);
+    try { localStorage.setItem("bpo_audit", JSON.stringify(auditLog)); } catch (e) {}
+}
+
+function touchActivity() { lastActivityTime = Date.now(); }
+
+function startSessionWatchdog() {
+    if (sessionTimeoutInterval) clearInterval(sessionTimeoutInterval);
+    sessionTimeoutInterval = setInterval(() => {
+        if (!currentUser) return;
+        if (Date.now() - lastActivityTime > SESSION_TIMEOUT_MS) {
+            alert("Oturum süresi doldu (30 dk). Çıkış yapılıyor.");
+            addAudit("OTURUM_ZAMAN_AŞIMI", "30 dk");
+            logout();
+        }
+    }, 15000);
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        await Backend.loadAll();
+        if (!allowedPlakalar.length) allowedPlakalar = [...initialPlakalar];
+        if (!usersList.length) usersList = JSON.parse(JSON.stringify(initialUsers));
+        usersList.forEach(u => {
+            if (!u.status) u.status = "approved";
+            if (!u.lastSeen) u.lastSeen = 0;
+        });
+        migrateUsersToHashedPasswords();
+        // Local mirror for offline resilience when online
+        {
+            try {
+                localStorage.setItem("bpo_plakalar", JSON.stringify(allowedPlakalar));
+                localStorage.setItem("bpo_users", JSON.stringify(usersList));
+            } catch (e) {}
+        }
+    } catch (e) {
+        console.error("Veri yükleme hatası:", e);
+        dataset = [];
+        usersList = JSON.parse(JSON.stringify(initialUsers));
+        allowedPlakalar = [...initialPlakalar];
+    }
+
+    document.querySelectorAll(".uppercase-input").forEach(input => {
+        input.addEventListener("input", (e) => {
+            e.target.value = e.target.value.toLocaleUpperCase("tr-TR");
+            if (e.target.closest("#tabEntry form")) formDirty = true;
+        });
+    });
+
+    ["click", "keydown", "mousemove", "scroll"].forEach(evt => {
+        document.addEventListener(evt, touchActivity, { passive: true });
+    });
+
+    window.addEventListener("beforeunload", (e) => {
+        if (formDirty && currentUser) { e.preventDefault(); e.returnValue = ""; }
+    });
+
+    document.addEventListener("keydown", (e) => {
+        const mod = e.ctrlKey || e.metaKey;
+        if (mod && e.key.toLowerCase() === "s") {
+            e.preventDefault();
+            if (currentUser && document.getElementById("tabEntry") && !document.getElementById("tabEntry").classList.contains("hidden")) {
+                document.querySelector("#tabEntry form")?.requestSubmit();
+            }
+        }
+        if (mod && e.key.toLowerCase() === "f" && currentUser) { e.preventDefault(); switchTab("search"); }
+        if (mod && e.key.toLowerCase() === "d" && currentUser) { e.preventDefault(); switchTab("dashboard"); }
+        if (mod && e.key.toLowerCase() === "e" && currentUser) { e.preventDefault(); switchTab("entry"); }
+        if (mod && e.key.toLowerCase() === "k" && currentUser) { e.preventDefault(); toggleChatModal(); }
+        if (mod && e.shiftKey && e.key.toLowerCase() === "t") { e.preventDefault(); toggleTheme(); }
+        if (e.key === "?" && !e.target.matches("input, textarea, select")) { e.preventDefault(); toggleShortcutsModal(); }
+        if (e.key === "Escape") {
+            document.getElementById("shortcutsModal")?.classList.add("hidden");
+            document.getElementById("chatModal")?.classList.add("hidden");
+            document.getElementById("userStatusModal")?.classList.add("hidden");
+            document.getElementById("excelPasteModal")?.classList.add("hidden");
+            document.getElementById("incompleteReasonModal")?.classList.add("hidden");
+        }
+    });
+
+    // Telefon maskesi
+    ["regPhone", "adminCreatePhone"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("input", (ev) => { ev.target.value = maskPhone(ev.target.value); });
+    });
+
+    initTheme();
+    registerServiceWorker();
+    startLiveClock();
+    sortDatasetByDateTime();
+    setDefaultTeyitDates();
+    renderPlakaList();
+    updateMarqueeBanner();
+    const footer = document.querySelector("footer div:last-child");
+    if (footer) footer.innerHTML = `© 2026 BPO Plastic Omnium · v${APP_VERSION}`;
+    if (window.lucide) lucide.createIcons();
+});
+
+/* ——— TEMA ——— */
+function initTheme() {
+    const saved = localStorage.getItem("bpo_theme") || "light";
+    applyTheme(saved);
+}
+function applyTheme(mode) {
+    const isDark = mode === "dark";
+    document.body.classList.toggle("theme-dark", isDark);
+    localStorage.setItem("bpo_theme", isDark ? "dark" : "light");
+    const label = document.getElementById("themeToggleLabel");
+    if (label) label.innerText = isDark ? "Açık" : "Koyu";
+    const btn = document.getElementById("themeToggleBtn");
+    if (btn) {
+        const icon = btn.querySelector("[data-lucide]");
+        if (icon) { icon.setAttribute("data-lucide", isDark ? "sun" : "moon"); if (window.lucide) lucide.createIcons(); }
+    }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", isDark ? "#0f3460" : "#000080");
+}
+function toggleTheme() {
+    const next = document.body.classList.contains("theme-dark") ? "light" : "dark";
+    applyTheme(next);
+}
+
+function toggleShortcutsModal() {
+    document.getElementById("shortcutsModal")?.classList.toggle("hidden");
+    if (window.lucide) lucide.createIcons();
+}
+
+function setSehpaFull() {
+    const el = document.getElementById("inputSehpaMiktari");
+    if (el) { el.value = "16"; calculateDoluluk(); formDirty = true; }
+}
+
+/* ——— PLAKA / TELEFON VALİDASYON ——— */
+function maskPhone(val) {
+    let d = String(val).replace(/\D/g, "").slice(0, 11);
+    if (d.length <= 4) return d;
+    if (d.length <= 7) return d.slice(0, 4) + " " + d.slice(4);
+    if (d.length <= 9) return d.slice(0, 4) + " " + d.slice(4, 7) + " " + d.slice(7);
+    return d.slice(0, 4) + " " + d.slice(4, 7) + " " + d.slice(7, 9) + " " + d.slice(9);
+}
+function isValidPlaka(plaka) {
+    const n = String(plaka).replace(/\s+/g, " ").trim().toLocaleUpperCase("tr-TR");
+    return PLAKA_REGEX.test(n);
+}
+function isValidPhone(phone) {
+    if (!phone) return true;
+    return PHONE_REGEX.test(String(phone).trim());
+}
+
+/* ——— PWA SERVICE WORKER ——— */
+function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return;
+    const swCode = `
+      const CACHE = 'bpo-lojistik-v24';
+      const ASSETS = [
+        'https://cdn.tailwindcss.com',
+        'https://unpkg.com/lucide@latest',
+        'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+      ];
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})).then(() => self.skipWaiting()));
+      });
+      self.addEventListener('activate', e => {
+        e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+      });
+      self.addEventListener('fetch', e => {
+        if (e.request.method !== 'GET') return;
+        e.respondWith(
+          caches.match(e.request).then(cached => {
+            const fetched = fetch(e.request).then(res => {
+              if (res && res.status === 200 && (e.request.url.startsWith('http'))) {
+                const clone = res.clone();
+                caches.open(CACHE).then(c => c.put(e.request, clone)).catch(()=>{});
+              }
+              return res;
+            }).catch(() => cached);
+            return cached || fetched;
+          })
+        );
+      });
+    `;
+    try {
+        const blob = new Blob([swCode], { type: "application/javascript" });
+        const url = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(url).then(() => {
+        }).catch(() => {});
+    } catch (err) { console.log("SW kayıt hatası:", err); }
+}
+
+/* ——— PDF İRSALİYE ——— */
+async function pdfLoadUnicodeFonts(doc) {
+    if (window.__bpoPdfFontsLoaded) return true;
+    const fetchFont = async (url) => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Font yüklenemedi");
+        const buf = await res.arrayBuffer();
+        let binary=""; const bytes=new Uint8Array(buf); const chunk=0x8000;
+        for(let i=0;i<bytes.length;i+=chunk) binary += String.fromCharCode(...bytes.subarray(i,i+chunk));
+        return btoa(binary);
+    };
+    try {
+        const regular = await fetchFont("https://github.com/google/fonts/raw/main/ofl/notosans/NotoSans%5Bwght%5D.ttf");
+        doc.addFileToVFS("NotoSans.ttf", regular);
+        doc.addFont("NotoSans.ttf", "NotoSans", "normal");
+        doc.setFont("NotoSans", "normal");
+        window.__bpoPdfFontsLoaded=true;
+        return true;
+    } catch(e) { return false; }
+}
+
+async function exportRecordPDF(id) {
+    const rec = dataset.find(d => d.id === id);
+    if (!rec) { alert("Kayıt bulunamadı!"); return; }
+    if (typeof window.jspdf === "undefined" && typeof window.jsPDF === "undefined") { alert("PDF kütüphanesi yüklenemedi."); return; }
+    const { jsPDF } = window.jspdf || window;
+    const doc = new jsPDF({ unit:"mm", format:"a4" });
+    const unicodeOk = await pdfLoadUnicodeFonts(doc);
+    if (!unicodeOk) { alert("Türkçe karakter fontu yüklenemedi. PDF oluşturulamadı. İnternet bağlantısını kontrol edin."); return; }
+    doc.setFont("NotoSans", "normal"); doc.setFontSize(16); doc.setTextColor(0,0,128);
+    doc.text("BPO LOJİSTİK - SEFER / İRSALİYE",105,18,{align:"center"});
+    doc.setFontSize(10); doc.setTextColor(80); doc.text("Plastic Omnium · Sevkiyat Operasyon Belgesi",105,25,{align:"center"});
+    doc.setDrawColor(0,0,128); doc.setLineWidth(0.5); doc.line(20,28,190,28);
+    doc.setTextColor(0); doc.setFontSize(11);
+    const rows=[
+      ["İrsaliye No",rec.irsaliyeNo||"-"],["Tarih / Saat",`${rec.tarih||"-"}  ${rec.kayitSaati||"-"}`],["Tesis",rec.tesis||"-"],
+      ["Plaka",rec.plaka||"-"],["Araç Tipi",rec.aractipi||"-"],["Nakliye Firması",rec.nakliye||"-"],["Şoför",rec.soforIsmi||"-"],
+      ["Çıkış Lokasyonu",rec.cikisLokasyon||"-"],["Varış Lokasyonu",rec.varisLokasyon||"-"],["Sehpa Miktarı",String(rec.cikisSehpaMiktari||"0")],["Notlar",rec.notlar||"-"]
+    ];
+    let y=40; rows.forEach(([label,val])=>{ doc.setFont("NotoSans","normal"); doc.setFontSize(10); doc.text(label+":",25,y); const lines=doc.splitTextToSize(String(val),110); doc.text(lines,70,y); y+=Math.max(8,lines.length*6); });
+    doc.setFontSize(8); doc.setTextColor(120); doc.text("Oluşturma: "+new Date().toLocaleString("tr-TR")+"  |  BPO Lojistik v"+APP_VERSION,105,285,{align:"center"});
+    doc.save(`BPO_Irsaliye_${(rec.irsaliyeNo||"kayit").replace(/[^\\w\\-]/g,"_")}.pdf`); showToast("PDF indirildi.");
+}
+
+/* ——— CHAT YAZIYOR + OKUNDU ——— */
+function onChatTyping() {
+    if (!currentUser) return;
+    const now = Date.now();
+    if (now - lastTypingBroadcast < 1500) return;
+    lastTypingBroadcast = now;
+    const payload = {
+        type: "typing",
+        user: currentUser.username,
+        name: currentUser.name,
+        to: document.getElementById("chatTargetSelect")?.value || "ALL",
+        at: now
+    };
+    try { localStorage.setItem("bpo_chat_typing", JSON.stringify(payload)); } catch (e) {}
+    // aynı sekmede de temizle
+    clearTimeout(chatTypingTimer);
+    chatTypingTimer = setTimeout(() => {
+        try { localStorage.removeItem("bpo_chat_typing"); } catch (e) {}
+    }, 3000);
+}
+
+function checkTypingIndicator() {
+    const el = document.getElementById("chatTypingIndicator");
+    if (!el || !currentUser) return;
+    try {
+        const raw = localStorage.getItem("bpo_chat_typing");
+        if (!raw) { el.classList.add("hidden"); return; }
+        const t = JSON.parse(raw);
+        if (t.user === currentUser.username) { el.classList.add("hidden"); return; }
+        if (Date.now() - (t.at || 0) > 4000) { el.classList.add("hidden"); return; }
+        const target = document.getElementById("chatTargetSelect")?.value || "ALL";
+        const relevant = t.to === "ALL" || t.to === currentUser.username || target === t.user;
+        if (relevant) {
+            el.innerText = `${t.name || t.user} yazıyor...`;
+            el.classList.remove("hidden");
+        } else {
+            el.classList.add("hidden");
+        }
+    } catch (e) { el.classList.add("hidden"); }
+}
+
+window.addEventListener("storage", (e) => {
+    if (e.key === "bpo_chat_typing") checkTypingIndicator();
+});
+
+function generateUUID() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
+
+function saveToLocalStorage() {
+    try {
+        localStorage.setItem("bpo_dataset", JSON.stringify(dataset));
+        localStorage.setItem("bpo_users", JSON.stringify(usersList));
+        localStorage.setItem("bpo_selected_facility", currentFacility);
+        localStorage.setItem("bpo_plakalar", JSON.stringify(allowedPlakalar));
+        localStorage.setItem("bpo_chat_messages", JSON.stringify(chatMessages));
+        localStorage.setItem("bpo_audit", JSON.stringify(auditLog));
+    } catch (e) {
+        console.error("Depolama Hatası:", e);
+        alert("Depolama Hatası! Tarayıcı kotası dolmuş olabilir.");
+    }
+}
+
+function updateMarqueeBanner() {
+    const marqueeEl = document.getElementById("marqueeText");
+    if (!marqueeEl) return;
+
+    const now = new Date();
+    const fiveMinutesMs = 5 * 60 * 1000;
+
+    const recentTrips = dataset.filter(item => {
+        if (!item.tarih || !item.kayitSaati) return false;
+        const tripDate = new Date(`${item.tarih}T${item.kayitSaati}`);
+        if (isNaN(tripDate.getTime())) return false;
+        const diff = now - tripDate;
+        return diff >= 0 && diff <= fiveMinutesMs;
+    });
+
+    if (recentTrips.length === 0) {
+        marqueeEl.innerText = "Son 5 dakika içerisinde yola çıkan yeni araç bulunmamaktadır.";
+        return;
+    }
+
+    const messages = recentTrips.map(item => {
+        const tesis = item.tesis ? `[${item.tesis}] ` : '';
+        const plaka = item.plaka || 'Bilinmeyen Plaka';
+        const cikis = item.cikisLokasyon || 'Çıkış Noktası';
+        const varis = item.varisLokasyon || 'Varış Noktası';
+        const saat = item.kayitSaati ? ` (${item.kayitSaati})` : '';
+        return `🚛 ${tesis}${plaka} PLAKALI ARAÇ, ${cikis} LOKASYONUNDAN ${varis} LOKASYONUNA DOĞRU YOLA ÇIKTI!${saat}`;
+    });
+
+    marqueeEl.innerHTML = messages.join("&nbsp;&nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp;&nbsp;");
+}
+
+/* 1. SEÇENEK: SENTEZLENMİŞ ARAÇ/TIR ÇALIŞTIRMA (MARŞ BASMA VE MOTOR ÇALIŞMA) SESİ */
+function playTruckStartSound() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        // MARŞ SESİ (Starter Motor Tıklaması ve Marş Basması)
+        const starterOsc = ctx.createOscillator();
+        const starterGain = ctx.createGain();
+        starterOsc.type = 'square';
+        starterOsc.frequency.setValueAtTime(30, now);
+        starterOsc.frequency.setValueAtTime(120, now + 0.1);
+        starterOsc.frequency.setValueAtTime(40, now + 0.2);
+        starterOsc.frequency.setValueAtTime(150, now + 0.3);
+        starterGain.gain.setValueAtTime(0.15, now);
+        starterGain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+        starterOsc.connect(starterGain);
+        starterGain.connect(ctx.destination);
+        starterOsc.start(now);
+        starterOsc.stop(now + 0.45);
+
+        // MOTOR ATEŞLEME VE DİZEL GÜRLEME SESİ
+        const engineOsc1 = ctx.createOscillator();
+        const engineOsc2 = ctx.createOscillator();
+        const engineFilter = ctx.createBiquadFilter();
+        const engineGain = ctx.createGain();
+
+        engineOsc1.type = 'sawtooth';
+        engineOsc2.type = 'triangle';
+
+        // Motor Çalışma Devri (Ateşleme -> Devirlenme -> Rölanti)
+        engineOsc1.frequency.setValueAtTime(35, now + 0.4);
+        engineOsc1.frequency.exponentialRampToValueAtTime(160, now + 0.7); 
+        engineOsc1.frequency.exponentialRampToValueAtTime(70, now + 1.4); 
+
+        engineOsc2.frequency.setValueAtTime(70, now + 0.4);
+        engineOsc2.frequency.exponentialRampToValueAtTime(320, now + 0.7);
+        engineOsc2.frequency.exponentialRampToValueAtTime(140, now + 1.4);
+
+        engineFilter.type = 'lowpass';
+        engineFilter.frequency.setValueAtTime(180, now + 0.4);
+        engineFilter.frequency.linearRampToValueAtTime(600, now + 0.7);
+        engineFilter.frequency.linearRampToValueAtTime(250, now + 1.4);
+
+        engineGain.gain.setValueAtTime(0.001, now);
+        engineGain.gain.setValueAtTime(0.01, now + 0.4);
+        engineGain.gain.linearRampToValueAtTime(0.25, now + 0.75);
+        engineGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+
+        engineOsc1.connect(engineFilter);
+        engineOsc2.connect(engineFilter);
+        engineFilter.connect(engineGain);
+        engineGain.connect(ctx.destination);
+
+        engineOsc1.start(now + 0.4);
+        engineOsc2.start(now + 0.4);
+        engineOsc1.stop(now + 1.65);
+        engineOsc2.stop(now + 1.65);
+
+    } catch (e) {
+        console.log("Araç çalıştırma sesi başlatılamadı:", e);
+    }
+}
+
+/* 2. ALTERNATİF SEÇENEK: SADE VE KISA BİLDİRİM BİP SESİ (ZİL/CHIME) */
+function playNotificationChimeSound() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+
+        // İki tonlu dinamik bildirim melodisi (E5 -> A5)
+        osc1.frequency.setValueAtTime(659.25, now); 
+        osc2.frequency.setValueAtTime(880.00, now + 0.12);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc1.stop(now + 0.12);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.45);
+    } catch (e) {
+        console.log("Bildirim sesi çalınamadı:", e);
+    }
+}
+
+function exportJSONBackup() {
+    const backupObj = {
+        exportDate: new Date().toISOString(),
+        dataset: dataset,
+        usersList: usersList,
+        allowedPlakalar: allowedPlakalar
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `BPO_LOJISTIK_YEDEK_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    showToast("Veritabanı Yedeği İndirildi.");
+}
+
+function importJSONBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            if (importedData.dataset && Array.isArray(importedData.dataset)) {
+                dataset = importedData.dataset;
+                if (importedData.usersList && Array.isArray(importedData.usersList)) {
+                    usersList = importedData.usersList;
+                }
+                if (importedData.allowedPlakalar && Array.isArray(importedData.allowedPlakalar)) {
+                    allowedPlakalar = importedData.allowedPlakalar;
+                }
+                saveToLocalStorage();
+                filterDataByFacility();
+                renderAll();
+                showToast("Yedek Başarıyla Yüklendi!");
+            } else {
+                alert("Geçersiz yedek dosyası!");
+            }
+        } catch (err) {
+            alert("Yedek dosyası okunamadı: " + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+function showToast(message) {
+    const toast = document.getElementById("toastNotification");
+    const toastText = document.getElementById("toastText");
+    if (toast && toastText) {
+        toastText.innerText = message;
+        toast.classList.remove("hidden");
+        setTimeout(() => {
+            toast.classList.add("hidden");
+        }, 3000);
+    }
+}
+
+function startLiveClock() {
+    setInterval(() => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('tr-TR');
+        const clockEl = document.getElementById("liveClock");
+        if (clockEl) clockEl.innerText = timeStr;
+    }, 1000);
+
+    setInterval(() => {
+        updateMarqueeBanner();
+    }, 15000);
+}
+
+function escapeHTML(str) {
+    if (!str && str !== 0) return '-';
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function formatTR(text) {
+    return text ? text.trim().toLocaleUpperCase('tr-TR') : '-';
+}
+
+function sortDatasetByDateTime() {
+    dataset.sort((a, b) => {
+        const dateA = new Date(`${a.tarih}T${a.kayitSaati || '00:00'}`);
+        const dateB = new Date(`${b.tarih}T${b.kayitSaati || '00:00'}`);
+        return dateB - dateA;
+    });
+}
+
+function calculateDoluluk() {
+    const isYakit = currentFacility === "Yakıt Sistemleri";
+    const aracTipi = document.getElementById("inputAracTipi")?.value;
+    const sehpaMiktari = parseFloat(document.getElementById("inputSehpaMiktari")?.value || 0);
+    const dolulukBox = document.getElementById("dolulukBox");
+
+    if (!dolulukBox) return;
+
+    if (isYakit && aracTipi === "TIR") {
+        dolulukBox.classList.remove("hidden");
+        const oran = Math.min(100, Math.round((sehpaMiktari / 16) * 100));
+        dolulukBox.innerText = `%${oran}`;
+
+        dolulukBox.className = "px-2 py-1.5 rounded font-bold text-xs whitespace-nowrap border ";
+
+        if (oran >= 100) {
+            dolulukBox.classList.add("bg-green-700", "text-white", "border-green-900");
+        } else if (sehpaMiktari <= 3) {
+            dolulukBox.classList.add("bg-red-700", "text-white", "border-red-900", "animate-pulse");
+        } else if (oran >= 75) {
+            dolulukBox.classList.add("bg-yellow-300", "text-black", "border-yellow-600");
+        } else if (oran >= 50) {
+            dolulukBox.classList.add("bg-amber-400", "text-black", "border-amber-700");
+        } else {
+            dolulukBox.classList.add("bg-orange-600", "text-white", "border-orange-800");
+        }
+    } else {
+        dolulukBox.classList.add("hidden");
+    }
+}
+
+function switchAuthMode(mode) {
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const loginBtn = document.getElementById("authTabLoginBtn");
+    const regBtn = document.getElementById("authTabRegisterBtn");
+
+    hideAuthErrors();
+
+    if (mode === 'login') {
+        loginForm.classList.remove("hidden");
+        registerForm.classList.add("hidden");
+        loginBtn.className = "px-3 py-1 font-bold text-xs bg-[#f5f4ea] border border-[#7f9db9] border-b-white -mb-px";
+        regBtn.className = "px-3 py-1 font-bold text-xs bg-[#d4d0c8] border border-[#7f9db9] text-gray-600";
+    } else {
+        loginForm.classList.add("hidden");
+        registerForm.classList.remove("hidden");
+        regBtn.className = "px-3 py-1 font-bold text-xs bg-[#f5f4ea] border border-[#7f9db9] border-b-white -mb-px";
+        loginBtn.className = "px-3 py-1 font-bold text-xs bg-[#d4d0c8] border border-[#7f9db9] text-gray-600";
+    }
+}
+
+function hideAuthErrors() {
+    document.getElementById("loginError")?.classList.add("hidden");
+    document.getElementById("loginPendingError")?.classList.add("hidden");
+    document.getElementById("loginRejectedError")?.classList.add("hidden");
+}
+
+function updateTabVisibility() {
+    const isAdmin = currentUser && (currentUser.role === "admin" || currentUser.role === "Sistem Yöneticisi (Admin)");
+    
+    const adminBtn = document.getElementById("tabBtnAdminHeader");
+    const teyitBtn = document.getElementById("tabBtnTeyit");
+
+    if (adminBtn) adminBtn.classList.toggle("hidden", !isAdmin);
+    if (teyitBtn) teyitBtn.classList.toggle("hidden", !isAdmin);
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    hideAuthErrors();
+    touchActivity();
+
+    const user = document.getElementById("loginUser").value.trim().toLocaleLowerCase("tr-TR");
+    const plainPass = document.getElementById("loginPass").value.trim();
+
+    if (!user || !plainPass) {
+        document.getElementById("loginError")?.classList.remove("hidden");
+        return;
+    }
+
+    const hashedPass = await hashPassword(plainPass);
+
+    let foundUser = usersList.find(u => {
+        if (u.username.toLocaleLowerCase("tr-TR") !== user) return false;
+        if (u.pass === hashedPass) return true;
+        if (u.pass === plainPass) return true; // düz metin eski kayıt
+        return false;
+    });
+
+    // Hâlâ bulunamadıysa varsayılan kullanıcılara dön
+    if (!foundUser) {
+        const def = initialUsers.find(u => u.username === user && u.pass === plainPass);
+        if (def) {
+            // Varsayılanları yeniden yükle ve hash'le
+            usersList = JSON.parse(JSON.stringify(initialUsers));
+            for (const u of usersList) {
+                if (!isHashedPassword(u.pass)) u.pass = await hashPassword(u.pass);
+            }
+            saveToLocalStorage();
+            foundUser = usersList.find(u => u.username.toLocaleLowerCase("tr-TR") === user);
+        }
+    }
+
+    if (foundUser) {
+        if (foundUser.status === "pending") {
+            document.getElementById("loginPendingError")?.classList.remove("hidden");
+            return;
+        }
+        if (foundUser.status === "rejected") {
+            document.getElementById("loginRejectedError")?.classList.remove("hidden");
+            return;
+        }
+
+        if (!isHashedPassword(foundUser.pass)) {
+            foundUser.pass = hashedPass;
+        }
+
+        currentUser = foundUser;
+        currentUser.lastSeen = Date.now();
+        saveToLocalStorage();
+        addAudit("GİRİŞ", user);
+        startUserHeartbeat();
+        startSessionWatchdog();
+
+        document.getElementById("authScreen")?.classList.add("hidden");
+        showToast(`Hoş geldiniz, ${currentUser.name}!`);
+
+        const isOnlyYakit = currentUser.username === "yakitsistemleri" || currentUser.facility === "Yakıt Sistemleri";
+        if (isOnlyYakit && currentUser.role !== "admin") {
+            selectFacility("Yakıt Sistemleri");
+        } else {
+            document.getElementById("facilitySelectionScreen")?.classList.remove("hidden");
+            adjustFacilitySelectionButtons();
+        }
+    } else {
+        document.getElementById("loginError")?.classList.remove("hidden");
+    }
+}
+
+async function handleRegister(e) {
+    e.preventDefault();
+    const name = document.getElementById("regName").value.trim();
+    const phone = document.getElementById("regPhone").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
+    const facility = document.getElementById("regFacility").value;
+    const username = document.getElementById("regUser").value.trim().toLocaleLowerCase("tr-TR");
+    const plainPass = document.getElementById("regPass").value.trim();
+
+    if (!plainPass || plainPass.length < 4) {
+        alert("Parola en az 4 karakter olmalıdır!");
+        return;
+    }
+    if (!isValidPhone(phone)) {
+        alert("Telefon formatı geçersiz!\nÖrnek: 05XX XXX XX XX");
+        return;
+    }
+    if (usersList.some(u => u.username.toLocaleLowerCase("tr-TR") === username)) {
+        alert("Bu kullanıcı adı zaten kullanılmaktadır!");
+        return;
+    }
+
+    const hashedPass = await hashPassword(plainPass);
+    usersList.push({
+        name, phone, email, facility, username, pass: hashedPass,
+        role: facility === "Yakıt Sistemleri" ? "Yakıt Sistemleri" : "Sevkiyat Sorumlusu",
+        status: "pending", lastSeen: 0
+    });
+    saveToLocalStorage();
+    addAudit("KAYIT_TALEBİ", username);
+    alert("Kayıt talebiniz iletildi. Admin onayından sonra giriş yapabilirsiniz.");
+    switchAuthMode("login");
+}
+
+function logout() {
+    if (currentUser) addAudit("ÇIKIŞ", currentUser.username);
+    currentUser = null;
+    formDirty = false;
+    if (userHeartbeatInterval) clearInterval(userHeartbeatInterval);
+    if (sessionTimeoutInterval) clearInterval(sessionTimeoutInterval);
+    document.getElementById("mainApp")?.classList.add("hidden");
+    document.getElementById("authScreen")?.classList.remove("hidden");
+    document.getElementById("loginUser").value = "";
+    document.getElementById("loginPass").value = "";
+}
+
+function adjustFacilitySelectionButtons() {
+    const btnPanayir = document.getElementById("facilityBtnPanayir");
+    const btnYakit = document.getElementById("facilityBtnYakit");
+
+    if (!currentUser) return;
+
+    if (currentUser.role === "admin" || currentUser.facility === "Tüm Tesisler") {
+        if (btnPanayir) btnPanayir.style.display = "inline-flex";
+        if (btnYakit) btnYakit.style.display = "inline-flex";
+    } else if (currentUser.facility === "Panayır") {
+        if (btnPanayir) btnPanayir.style.display = "inline-flex";
+        if (btnYakit) btnYakit.style.display = "none";
+    } else if (currentUser.facility === "Yakıt Sistemleri" || currentUser.username.toLocaleLowerCase('tr-TR') === "yakitsistemleri") {
+        if (btnPanayir) btnPanayir.style.display = "none";
+        if (btnYakit) btnYakit.style.display = "inline-flex";
+    }
+}
+
+function startUserHeartbeat() {
+    if (userHeartbeatInterval) clearInterval(userHeartbeatInterval);
+    
+    userHeartbeatInterval = setInterval(() => {
+        if (currentUser) {
+            const u = usersList.find(x => x.username === currentUser.username);
+            if (u) {
+                u.lastSeen = Date.now();
+                saveToLocalStorage();
+            }
+        }
+        renderUserStatuses();
+        checkNewChatNotification();
+        checkTypingIndicator();
+    }, 4000);
+}
+
+function flashChatButton() {
+    document.getElementById("chatSoundIcon")?.classList.remove("hidden");
+    const btn = document.getElementById("chatToolbarBtn");
+    if (!btn) return;
+    btn.classList.remove("chat-btn-flash");
+    void btn.offsetWidth; // reflow — animasyonu yeniden başlat
+    btn.classList.add("chat-btn-flash");
+    setTimeout(() => btn.classList.remove("chat-btn-flash"), 2500);
+}
+
+function notifyIncomingChat(msg, count) {
+    const unreadBadge = document.getElementById("chatUnreadBadge");
+    if (unreadBadge) {
+        const prev = parseInt(unreadBadge.innerText, 10) || 0;
+        unreadBadge.innerText = prev + (count || 1);
+        unreadBadge.classList.remove("hidden");
+    }
+    flashChatButton();
+    playNotificationChimeSound();
+    // İkinci kısa bip (daha dikkat çekici)
+    setTimeout(() => playNotificationChimeSound(), 280);
+    const priv = msg.to && msg.to !== "ALL";
+    showToast(`${priv ? "🔒 Özel" : "Yeni"} Mesaj: ${msg.senderName}`);
+    // Sekme başlığı uyarısı
+    const origTitle = document.title;
+    document.title = `💬 Yeni mesaj! — ${msg.senderName}`;
+    setTimeout(() => { document.title = origTitle; }, 4000);
+}
+
+function checkNewChatNotification() {
+    const storedChat = localStorage.getItem("bpo_chat_messages");
+    if (!storedChat || !currentUser) return;
+
+    const currentChat = JSON.parse(storedChat);
+    const chatModal = document.getElementById("chatModal");
+    const isModalOpen = chatModal && !chatModal.classList.contains("hidden");
+
+    if (currentChat.length > lastChatCount) {
+        const newMsgs = currentChat.slice(lastChatCount);
+        const relevant = newMsgs.filter(m =>
+            m.sender !== currentUser.username &&
+            (!m.to || m.to === "ALL" || m.to === currentUser.username)
+        );
+        if (relevant.length > 0) {
+            const lastMsg = relevant[relevant.length - 1];
+            if (!isModalOpen) {
+                notifyIncomingChat(lastMsg, relevant.length);
+            } else {
+                // Modal açıkken de ses + toast (görsel güncelleme)
+                playNotificationChimeSound();
+                renderChatMessages();
+            }
+        } else if (isModalOpen) {
+            renderChatMessages();
+        }
+        lastChatCount = currentChat.length;
+    }
+}
+
+// Farklı sekme / kullanıcı aynı tarayıcıda yazarsa anında yakala
+window.addEventListener("storage", (e) => {
+    if (e.key === "bpo_chat_messages" && currentUser) {
+        checkNewChatNotification();
+    }
+});
+
+function toggleUserStatusModal() {
+    const modal = document.getElementById("userStatusModal");
+    if (modal) {
+        modal.classList.toggle("hidden");
+        if (!modal.classList.contains("hidden")) {
+            renderUserStatuses();
+        }
+    }
+}
+
+function renderUserStatuses() {
+    const badgesDiv = document.getElementById("userStatusBadges");
+    const countBadge = document.getElementById("onlineCountBadge");
+    if (!badgesDiv) return;
+
+    badgesDiv.innerHTML = "";
+    const now = Date.now();
+    
+    const latestUsersStr = localStorage.getItem("bpo_users");
+    if (latestUsersStr) {
+        usersList = JSON.parse(latestUsersStr);
+    }
+
+    let onlineCount = 0;
+
+    usersList.forEach(u => {
+        const isOnline = (now - (u.lastSeen || 0)) < 30000;
+        if (isOnline) onlineCount++;
+
+        badgesDiv.innerHTML += `
+            <div class="flex items-center justify-between p-1.5 rounded border text-xs ${isOnline ? 'bg-green-50 border-green-300 text-green-900' : 'bg-gray-100 border-gray-300 text-gray-600'}">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-600 animate-pulse' : 'bg-gray-400'}"></span>
+                <span class="font-bold">${escapeHTML(u.name)}</span>
+                <span class="text-[9px] text-gray-500">(${escapeHTML(u.username)})</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${isOnline ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-700'}">
+                  ${isOnline ? 'Çevrim İçi' : 'Çevrim Dışı'}
+                </span>
+                ${u.username !== currentUser?.username && u.status === 'approved' ? `<button onclick="messageUser('${u.username}'); toggleUserStatusModal();" class="canias-btn px-1.5 py-0.5 text-[9px]" title="Mesaj Gönder">💬</button>` : ''}
+              </div>
+            </div>
+        `;
+    });
+
+    if (countBadge) countBadge.innerText = onlineCount;
+}
+
+function populateChatTargets() {
+    const sel = document.getElementById("chatTargetSelect");
+    if (!sel || !currentUser) return;
+    const cur = sel.value || "ALL";
+    sel.innerHTML = `<option value="ALL">📢 Herkese (Genel Sohbet)</option>`;
+    usersList.filter(u => u.username !== currentUser.username && u.status === "approved").forEach(u => {
+        sel.innerHTML += `<option value="${escapeHTML(u.username)}">🔒 ${escapeHTML(u.name)} (${escapeHTML(u.username)}) · ${escapeHTML(u.facility || "-")}</option>`;
+    });
+    sel.value = cur;
+    chatTarget = cur;
+}
+
+function onChatTargetChange() {
+    chatTarget = document.getElementById("chatTargetSelect")?.value || "ALL";
+    renderChatMessages();
+    const input = document.getElementById("chatInputMessage");
+    if (input) {
+        input.placeholder = chatTarget === "ALL" ? "Genel mesaj yazın..." : "Özel mesaj yazın...";
+        input.focus();
+    }
+}
+
+function toggleChatModal() {
+    const modal = document.getElementById("chatModal");
+    const unreadBadge = document.getElementById("chatUnreadBadge");
+    if (modal) {
+        modal.classList.toggle("hidden");
+        if (!modal.classList.contains("hidden")) {
+            if (unreadBadge) {
+                unreadBadge.classList.add("hidden");
+                unreadBadge.innerText = "0";
+            }
+            document.getElementById("chatToolbarBtn")?.classList.remove("chat-btn-flash");
+            document.getElementById("chatSoundIcon")?.classList.add("hidden");
+            // Okundu say — son sayacı güncelle
+            lastChatCount = chatMessages.length;
+            populateChatTargets();
+            renderChatMessages();
+            markChatAsRead();
+            document.getElementById("chatInputMessage")?.focus();
+        }
+    }
+}
+
+function renderChatMessages() {
+    const box = document.getElementById("chatMessagesBox");
+    if (!box || !currentUser) return;
+    box.innerHTML = "";
+
+    const filtered = chatMessages.filter(msg => {
+        const isPrivate = msg.to && msg.to !== "ALL";
+        if (chatTarget === "ALL") return !isPrivate;
+        return isPrivate && (
+            (msg.sender === currentUser.username && msg.to === chatTarget) ||
+            (msg.sender === chatTarget && msg.to === currentUser.username)
+        );
+    });
+
+    if (filtered.length === 0) {
+        box.innerHTML = `<div class="text-center text-gray-500 text-xs italic py-6">${chatTarget === "ALL" ? "Henüz genel mesaj yok." : "Bu kişiyle henüz özel mesaj yok."}</div>`;
+        return;
+    }
+
+    filtered.forEach(msg => {
+        const isMe = msg.sender === currentUser.username;
+        const isPrivate = msg.to && msg.to !== "ALL";
+        const readBy = msg.readBy || [];
+        let readStatus = "";
+        if (isMe) {
+            if (isPrivate) {
+                const otherRead = readBy.includes(msg.to);
+                readStatus = otherRead
+                    ? '<span class="text-blue-600 text-[9px]" title="Okundu">✓✓ Okundu</span>'
+                    : '<span class="text-gray-400 text-[9px]" title="İletildi">✓ İletildi</span>';
+            } else {
+                const others = readBy.filter(u => u !== currentUser.username).length;
+                readStatus = others > 0
+                    ? `<span class="text-blue-600 text-[9px]" title="${others} kişi okudu">✓✓ ${others}</span>`
+                    : '<span class="text-gray-400 text-[9px]" title="İletildi">✓ İletildi</span>';
+            }
+        }
+        box.innerHTML += `
+            <div class="flex flex-col ${isMe ? "items-end" : "items-start"}">
+              <div class="text-[9px] font-bold text-gray-600 px-1 flex items-center gap-1">
+                ${isPrivate ? '<span class="text-purple-700">🔒</span>' : ""}
+                ${escapeHTML(msg.senderName)}
+                ${isPrivate && isMe ? `<span class="text-purple-600 font-normal">→ ${escapeHTML(msg.toName || msg.to)}</span>` : ""}
+                <span class="text-[8px] font-normal">${msg.time}</span>
+                ${readStatus}
+              </div>
+              <div class="p-2 rounded text-xs max-w-[80%] ${isMe
+                  ? (isPrivate ? "bg-purple-100 border border-purple-400 text-black" : "bg-[#c1deec] border border-[#316ac5] text-black")
+                  : (isPrivate ? "bg-amber-50 border border-amber-400 text-black" : "bg-[#f5f4ea] border border-[#7f9db9] text-black")}">
+                ${escapeHTML(msg.text)}
+              </div>
+            </div>`;
+    });
+    box.scrollTop = box.scrollHeight;
+}
+
+function sendChatMessage() {
+    const input = document.getElementById("chatInputMessage");
+    if (!input || !input.value.trim() || !currentUser) return;
+    const timeStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+    const target = document.getElementById("chatTargetSelect")?.value || "ALL";
+    const targetUser = target !== "ALL" ? usersList.find(u => u.username === target) : null;
+    chatMessages.push({
+        id: generateUUID(),
+        sender: currentUser.username,
+        senderName: currentUser.name,
+        to: target,
+        toName: targetUser ? targetUser.name : "Herkes",
+        text: input.value.trim(),
+        time: timeStr,
+        timestamp: Date.now(),
+        readBy: [currentUser.username]
+    });
+    if (chatMessages.length > 1000) chatMessages = chatMessages.slice(-1000);
+    try { localStorage.removeItem("bpo_chat_typing"); } catch (e) {}
+    Backend.saveChat();
+    Backend.persistAll();
+    input.value = "";
+    renderChatMessages();
+}
+
+function markChatAsRead() {
+    if (!currentUser || !chatMessages.length) return;
+    let changed = false;
+    chatMessages.forEach(msg => {
+        if (!msg.readBy) msg.readBy = [];
+        const isForMe = !msg.to || msg.to === "ALL" || msg.to === currentUser.username;
+        if (isForMe && msg.sender !== currentUser.username && !msg.readBy.includes(currentUser.username)) {
+            msg.readBy.push(currentUser.username);
+            changed = true;
+        }
+    });
+    if (changed) saveToLocalStorage();
+}
+
+function selectFacility(facility) {
+    currentFacility = facility;
+    localStorage.setItem("bpo_selected_facility", facility);
+
+    document.getElementById("facilitySelectionScreen")?.classList.add("hidden");
+    document.getElementById("mainApp")?.classList.remove("hidden");
+
+    const badge = document.getElementById("activeFacilityBadge");
+    if (badge) badge.innerText = facility.toLocaleUpperCase('tr-TR');
+
+    const userDisp = document.getElementById("currentUserDisplay");
+    const userRole = document.getElementById("currentUserRole");
+    if (userDisp) userDisp.innerText = currentUser.name;
+    if (userRole) userRole.innerText = `${currentUser.role} (${facility})`;
+
+    updateTabVisibility();
+    adjustFormByFacility();
+    filterDataByFacility();
+    renderAll();
+}
+
+function changeFacility() {
+    if (currentUser.role !== "admin" && currentUser.facility !== "Tüm Tesisler") {
+        alert("Yetkiniz sadece bulunduğunuz tesisle sınırlıdır.");
+        return;
+    }
+    document.getElementById("facilitySelectionScreen")?.classList.remove("hidden");
+}
+
+function adjustFormByFacility() {
+    const sehpaField = document.getElementById("field_sehpa");
+    if (sehpaField) {
+        if (currentFacility === "Yakıt Sistemleri") {
+            sehpaField.classList.remove("hidden");
+        } else {
+            sehpaField.classList.add("hidden");
+        }
+    }
+}
+
+function filterDataByFacility() {
+    if (currentFacility === "Tüm Tesisler" || currentUser?.role === "admin") {
+        activeData = [...dataset];
+    } else {
+        activeData = dataset.filter(item => item.tesis === currentFacility);
+    }
+}
+
+function switchTab(tabName) {
+    const isAdmin = currentUser && (currentUser.role === "admin" || currentUser.role === "Sistem Yöneticisi (Admin)");
+    if (!isAdmin && (tabName === 'teyit' || tabName === 'admin')) {
+        tabName = 'entry';
+    }
+
+    const tabs = ['entry', 'search', 'dashboard', 'admin', 'teyit'];
+    const btnMap = {
+        entry: 'tabBtn1',
+        search: 'tabBtnSearch',
+        dashboard: 'tabBtnDashboard',
+        admin: 'tabBtnAdminHeader',
+        teyit: 'tabBtnTeyit'
+    };
+    tabs.forEach(t => {
+        const el = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        const btn = document.getElementById(btnMap[t]);
+        if (el) el.classList.add("hidden");
+        if (btn) btn.classList.remove("active");
+    });
+
+    const activeEl = document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+    const activeBtn = document.getElementById(btnMap[tabName]);
+    
+    if (activeEl) activeEl.classList.remove("hidden");
+    if (activeBtn) activeBtn.classList.add("active");
+
+    if (tabName === 'teyit') {
+        renderTeyitSection();
+    } else if (tabName === 'admin') {
+        renderAdminTables();
+    } else if (tabName === 'dashboard') {
+        setTimeout(() => { renderDashboardCharts(); renderOperationsOverview(); }, 50);
+    } else if (tabName === 'search') {
+        executeAdvancedSearch();
+    }
+}
+
+function renderAll() {
+    renderKPIs();
+    renderQuickTable();
+    if (!document.getElementById("tabSearch")?.classList.contains("hidden")) {
+        executeAdvancedSearch();
+    }
+    if (!document.getElementById("tabTeyit")?.classList.contains("hidden")) {
+        renderTeyitSection();
+    }
+    if (!document.getElementById("tabDashboard")?.classList.contains("hidden")) {
+        renderDashboardCharts();
+        renderOperationsOverview();
+    }
+    updateMarqueeBanner();
+}
+
+function renderKPIs() {
+    const totalEl = document.getElementById("kpiTotalTrips");
+    const todayEl = document.getElementById("kpiTodayTrips");
+    const avgEl = document.getElementById("kpiDailyAvg");
+
+    const total = activeData.length;
+    const now = new Date();
+    const todayStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+    const todayCount = activeData.filter(d => d.tarih === todayStr).length;
+
+    const uniqueDays = new Set(activeData.map(d => d.tarih)).size || 1;
+    const avg = (total / uniqueDays).toFixed(1);
+
+    if (totalEl) totalEl.innerText = total;
+    if (todayEl) todayEl.innerText = todayCount;
+    if (avgEl) avgEl.innerText = avg;
+}
+
+function renderDashboardCharts() {
+    if (typeof Chart === "undefined") return;
+    const source = (activeData && activeData.length) ? activeData : dataset;
+    const dayLabels = [], dayCounts = [];
+    for (let i = 13; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+        dayLabels.push(String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0"));
+        dayCounts.push(source.filter(x => x.tarih === key).length);
+    }
+    const tesisMap = {}, aracMap = {}, nakMap = {};
+    source.forEach(d => {
+        tesisMap[d.tesis || "Diğer"] = (tesisMap[d.tesis || "Diğer"] || 0) + 1;
+        aracMap[d.aractipi || "Diğer"] = (aracMap[d.aractipi || "Diğer"] || 0) + 1;
+        nakMap[d.nakliye || "-"] = (nakMap[d.nakliye || "-"] || 0) + 1;
+    });
+    const nakSorted = Object.entries(nakMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const colors = ["#000080", "#316ac5", "#2e8b57", "#c45c00", "#800080", "#a52a2a", "#008080", "#4b0082"];
+    const makeOrUpdate = (existing, canvasId, config) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return existing;
+        if (existing) existing.destroy();
+        return new Chart(canvas, config);
+    };
+    chartDaily = makeOrUpdate(chartDaily, "chartDailyTrips", {
+        type: "bar",
+        data: { labels: dayLabels, datasets: [{ label: "Sefer", data: dayCounts, backgroundColor: "#316ac5", borderColor: "#000080", borderWidth: 1 }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+    chartFacility = makeOrUpdate(chartFacility, "chartFacility", {
+        type: "doughnut",
+        data: { labels: Object.keys(tesisMap), datasets: [{ data: Object.values(tesisMap), backgroundColor: colors }] },
+        options: { responsive: true, plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 10 } } } } }
+    });
+    chartVehicle = makeOrUpdate(chartVehicle, "chartVehicleType", {
+        type: "pie",
+        data: { labels: Object.keys(aracMap), datasets: [{ data: Object.values(aracMap), backgroundColor: colors }] },
+        options: { responsive: true, plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 10 } } } } }
+    });
+    chartNakliye = makeOrUpdate(chartNakliye, "chartNakliye", {
+        type: "bar",
+        data: { labels: nakSorted.map(x => x[0].length > 14 ? x[0].slice(0, 14) + "…" : x[0]), datasets: [{ label: "Sefer", data: nakSorted.map(x => x[1]), backgroundColor: "#2e8b57", borderColor: "#006400", borderWidth: 1 }] },
+        options: { indexAxis: "y", responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+}
+
+function showTripDetail(id) {
+    const item = dataset.find(d => String(d.id) === String(id));
+    if (!item) return;
+    const body = document.getElementById("tripDetailBody");
+    if (!body) return;
+    const fields = [["İrsaliye",item.irsaliyeNo],["Tarih",item.tarih],["Kayıt Saati",item.kayitSaati],["Plaka",item.plaka],["Araç Tipi",item.aractipi],["Nakliye",item.nakliye],["Şoför",item.soforIsmi],["Çıkış",item.cikisLokasyon],["Varış",item.varisLokasyon],["Sehpa",item.cikisSehpaMiktari||"0"],["Tesis",item.tesis],["Not",item.notlar||"-"]];
+    body.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-3 gap-2">${fields.map(([label,value])=>`<div class="bg-white border border-[#7f9db9] rounded p-2"><div class="text-[9px] font-bold text-gray-500 uppercase">${escapeHTML(label)}</div><div class="font-bold text-xs mt-0.5">${escapeHTML(value??"-")}</div></div>`).join("")}</div>
+      <div class="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-300"><button onclick="editRecord('${item.id}'); closeTripDetail();" class="canias-btn"><i data-lucide="edit" class="w-3.5 h-3.5"></i> Düzenle</button><button onclick="exportRecordPDF('${item.id}')" class="canias-btn"><i data-lucide="file-text" class="w-3.5 h-3.5 text-red-700"></i> PDF</button></div>`;
+    document.getElementById("tripDetailModal")?.classList.remove("hidden");
+    if (window.lucide) lucide.createIcons();
+}
+function closeTripDetail() { document.getElementById("tripDetailModal")?.classList.add("hidden"); }
+function renderOperationsOverview() {
+    const source=activeData||[], now=Date.now(), today=new Date(), todayStr=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+    const todayItems=source.filter(x=>x.tarih===todayStr), hours={};
+    todayItems.forEach(x=>{const h=parseInt(String(x.kayitSaati||"").split(":")[0],10);if(Number.isFinite(h))hours[h]=(hours[h]||0)+1;});
+    const peak=Object.entries(hours).sort((a,b)=>b[1]-a[1])[0], carriers=new Set(source.filter(x=>x.nakliye).map(x=>String(x.nakliye).toLocaleUpperCase("tr-TR")));
+    const last24=source.filter(x=>{const t=new Date(`${x.tarih||""}T${x.kayitSaati||"00:00"}:00`).getTime();return Number.isFinite(t)&&now-t<=86400000&&now-t>=0;}).length;
+    const set=(id,v)=>{const e=document.getElementById(id);if(e)e.innerText=v;};
+    set("dashTodayPerHour",(todayItems.length/Math.max(new Date().getHours()+1,1)).toFixed(1));set("dashLast24",last24);set("dashPeakHour",peak?`${String(peak[0]).padStart(2,"0")}:00 (${peak[1]})`:"-");set("dashActiveCarriers",carriers.size);set("dashboardUpdatedAt",`Son hesaplama: ${new Date().toLocaleTimeString("tr-TR")}`);
+    const panel=document.getElementById("liveOperationsPanel");if(!panel)return;
+    const recent=[...source].sort((a,b)=>{const A=`${b.tarih||""} ${b.kayitSaati||""}`,B=`${a.tarih||""} ${a.kayitSaati||""}`;return A.localeCompare(B);}).slice(0,4);
+    panel.innerHTML=recent.length?recent.map(x=>`<button onclick="showTripDetail('${x.id}')" class="text-left bg-white border border-[#7f9db9] rounded p-2 hover:bg-blue-50"><div class="flex justify-between items-center"><span class="font-black text-[#000080]">${escapeHTML(x.plaka||"-")}</span><span class="text-[9px] font-bold text-gray-500">${escapeHTML(x.kayitSaati||"-")}</span></div><div class="font-bold text-xs mt-1">${escapeHTML(x.cikisLokasyon||"-")} → ${escapeHTML(x.varisLokasyon||"-")}</div><div class="text-[10px] text-gray-600 mt-1">${escapeHTML(x.nakliye||"-")} · ${escapeHTML(x.aractipi||"-")}</div></button>`).join(""):`<div class="col-span-full text-center text-gray-500 py-3">Gösterilecek hareket bulunmuyor.</div>`;
+    if(window.lucide)lucide.createIcons();
+}
+
+function handleFormSubmit(e) {
+    e.preventDefault();
+    touchActivity();
+
+    const editId = document.getElementById("editRecordId").value;
+    const irsaliyeNo = formatTR(document.getElementById("inputIrsaliyeNo").value);
+    const plaka = formatTR(document.getElementById("inputPlaka").value);
+    const nakliye = formatTR(document.getElementById("inputNakliye").value);
+    const aracTipi = document.getElementById("inputAracTipi").value;
+    const soforIsmi = formatTR(document.getElementById("inputSoforIsmi").value);
+    const cikisLokasyon = formatTR(document.getElementById("inputCikis").value);
+    const varisLokasyon = formatTR(document.getElementById("inputVaris").value);
+    const sehpaMiktari = document.getElementById("inputSehpaMiktari")?.value || "0";
+    const notlar = formatTR(document.getElementById("inputNotlar").value);
+
+    if (!irsaliyeNo || !plaka) {
+        alert("İrsaliye No ve Plaka zorunludur!");
+        return;
+    }
+
+    // Plaka format kontrolü (TR: 34 ABC 123 / 16 BPO 01)
+    if (!isValidPlaka(plaka)) {
+        alert("Plaka formatı geçersiz!\n\nÖrnekler: 16 BPO 01  ·  34 ABC 123  ·  06 A 1234\nİl kodu (01-81) + harf + sayı olmalıdır.");
+        return;
+    }
+
+    // Plaka zorunluluğu: tanımlı plakalar listesinde olmalı (admin hariç)
+    const isAdminUser = currentUser && (currentUser.role === "admin" || currentUser.role === "Sistem Yöneticisi (Admin)");
+    if (!isAdminUser && allowedPlakalar.length > 0) {
+        const normalizedPlaka = plaka.replace(/\s+/g, "");
+        const isAllowed = allowedPlakalar.some(p => p.replace(/\s+/g, "") === normalizedPlaka);
+        if (!isAllowed) {
+            alert(`Bu plaka sistemde tanımlı değil!\n\nPlaka: ${plaka}\n\nLütfen Admin panelinden plaka tanımlayın veya geçerli bir plaka girin.`);
+            return;
+        }
+    }
+
+    const duplicate = dataset.find(d => d.irsaliyeNo === irsaliyeNo && d.id !== editId);
+    if (duplicate) {
+        alert(`Bu irsaliye numarası zaten kayıtlı!\nTarih: ${duplicate.tarih} · Plaka: ${duplicate.plaka}`);
+        return;
+    }
+
+    if (currentFacility === "Yakıt Sistemleri" && aracTipi === "TIR") {
+        const sehpaNum = parseFloat(sehpaMiktari || 0);
+        if (sehpaNum < 16 && !editId) {
+            document.getElementById("incompleteReasonModal")?.classList.remove("hidden");
+            return;
+        }
+    }
+
+    executeSaveRecord({
+        editId, irsaliyeNo, plaka, nakliye, aracTipi, soforIsmi, cikisLokasyon, varisLokasyon, sehpaMiktari, notlar
+    });
+}
+
+function confirmIncompleteSubmit() {
+    const reasonInput = document.getElementById("incompleteReasonInput");
+    const reason = formatTR(reasonInput?.value || "");
+
+    if (!reason) {
+        alert("Lütfen eksik gönderim nedenini belirtiniz!");
+        return;
+    }
+
+    const editId = document.getElementById("editRecordId").value;
+    const irsaliyeNo = formatTR(document.getElementById("inputIrsaliyeNo").value);
+    const plaka = formatTR(document.getElementById("inputPlaka").value);
+    const nakliye = formatTR(document.getElementById("inputNakliye").value);
+    const aracTipi = document.getElementById("inputAracTipi").value;
+    const soforIsmi = formatTR(document.getElementById("inputSoforIsmi").value);
+    const cikisLokasyon = formatTR(document.getElementById("inputCikis").value);
+    const varisLokasyon = formatTR(document.getElementById("inputVaris").value);
+    const sehpaMiktari = document.getElementById("inputSehpaMiktari")?.value || "0";
+    let notlar = formatTR(document.getElementById("inputNotlar").value);
+
+    notlar = `[EKSİK SEVK: ${reason}] ${notlar}`;
+
+    closeIncompleteModal();
+    executeSaveRecord({
+        editId, irsaliyeNo, plaka, nakliye, aracTipi, soforIsmi, cikisLokasyon, varisLokasyon, sehpaMiktari, notlar
+    });
+}
+
+function closeIncompleteModal() {
+    document.getElementById("incompleteReasonModal")?.classList.add("hidden");
+    const reasonInput = document.getElementById("incompleteReasonInput");
+    if (reasonInput) reasonInput.value = "";
+}
+
+async function executeSaveRecord(data) {
+    if (!currentUser) { alert("Oturum gerekli."); return; }
+    const now = new Date();
+    const dateStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+    const timeStr = now.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+    let savedRecord = null;
+
+    if (data.editId) {
+        const item = dataset.find(d => d.id === data.editId);
+        if (item) {
+            item.irsaliyeNo = data.irsaliyeNo;
+            item.plaka = data.plaka;
+            item.nakliye = data.nakliye;
+            item.aractipi = data.aracTipi;
+            item.soforIsmi = data.soforIsmi;
+            item.cikisLokasyon = data.cikisLokasyon;
+            item.varisLokasyon = data.varisLokasyon;
+            item.cikisSehpaMiktari = data.sehpaMiktari;
+            item.notlar = data.notlar;
+            savedRecord = item;
+            showToast("Kayıt Güncellendi!");
+            addAudit("KAYIT_GÜNCELLE", data.irsaliyeNo);
+        }
+    } else {
+        savedRecord = {
+            id: generateUUID(),
+            tesis: currentFacility,
+            tarih: dateStr,
+            kayitSaati: timeStr,
+            irsaliyeNo: data.irsaliyeNo,
+            nakliye: data.nakliye,
+            plaka: data.plaka,
+            aractipi: data.aracTipi,
+            cikisLokasyon: data.cikisLokasyon,
+            cikisSehpaMiktari: data.sehpaMiktari,
+            varisLokasyon: data.varisLokasyon,
+            soforIsmi: data.soforIsmi,
+            notlar: data.notlar
+        };
+        dataset.unshift(savedRecord);
+        showToast("Yeni Sevkiyat Kaydedildi!");
+        addAudit("KAYIT_EKLE", data.irsaliyeNo + " / " + data.plaka);
+        playTruckStartSound();
+    }
+
+    formDirty = false;
+    if (savedRecord) await Backend.upsertTrip(savedRecord);
+    await Backend.persistAll();
+    resetForm();
+    filterDataByFacility();
+    renderAll();
+}
+
+function resetForm() {
+    document.getElementById("editRecordId").value = "";
+    document.getElementById("inputIrsaliyeNo").value = "";
+    document.getElementById("inputPlaka").value = "";
+    document.getElementById("inputNakliye").value = "";
+    document.getElementById("inputAracTipi").value = "TIR";
+    document.getElementById("inputSoforIsmi").value = "";
+    document.getElementById("inputCikis").value = "";
+    document.getElementById("inputVaris").value = "";
+    document.getElementById("inputNotlar").value = "";
+    const sehpa = document.getElementById("inputSehpaMiktari");
+    if (sehpa) sehpa.value = "";
+
+    document.getElementById("submitBtnText").innerText = "KAYDET";
+    document.getElementById("cancelEditBtn")?.classList.add("hidden");
+    calculateDoluluk();
+}
+
+function cancelEdit() {
+    resetForm();
+}
+
+function editRecord(id) {
+    const record = dataset.find(d => d.id === id);
+    if (!record) return;
+
+    document.getElementById("editRecordId").value = record.id;
+    document.getElementById("inputIrsaliyeNo").value = record.irsaliyeNo;
+    document.getElementById("inputPlaka").value = record.plaka;
+    document.getElementById("inputNakliye").value = record.nakliye;
+    document.getElementById("inputAracTipi").value = record.aractipi;
+    document.getElementById("inputSoforIsmi").value = record.soforIsmi;
+    document.getElementById("inputCikis").value = record.cikisLokasyon;
+    document.getElementById("inputVaris").value = record.varisLokasyon;
+    document.getElementById("inputNotlar").value = record.notlar;
+
+    const sehpa = document.getElementById("inputSehpaMiktari");
+    if (sehpa) sehpa.value = record.cikisSehpaMiktari || "0";
+
+    document.getElementById("submitBtnText").innerText = "GÜNCELLE";
+    document.getElementById("cancelEditBtn")?.classList.remove("hidden");
+
+    switchTab('entry');
+    calculateDoluluk();
+}
+
+async function deleteRecord(id) {
+    if (!requireAdmin("Kayıt silme")) return;
+    if (confirm("Bu sefer kaydını silmek istediğinize emin misiniz?")) {
+        dataset = dataset.filter(d => d.id !== id);
+        await Backend.deleteTrip(id);
+        await Backend.persistAll();
+        addAudit("KAYIT_SİL", id);
+        filterDataByFacility();
+        renderAll();
+        showToast("Kayıt Silindi!");
+    }
+}
+
+function renderQuickTable() {
+    const tbody = document.getElementById("quickTableBody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+    const total = activeData.length;
+    const totalPages = Math.ceil(total / quickRowsPerPage) || 1;
+    if (quickPage > totalPages) quickPage = totalPages;
+    if (quickPage < 1) quickPage = 1;
+
+    const startIdx = (quickPage - 1) * quickRowsPerPage;
+    const pageItems = activeData.slice(startIdx, startIdx + quickRowsPerPage);
+
+    pageItems.forEach((item, index) => {
+        tbody.innerHTML += `
+            <tr>
+              <td>${startIdx + index + 1}</td>
+              <td>${escapeHTML(item.tarih)}</td>
+              <td class="font-bold text-green-800">${escapeHTML(item.nakliye || "-")}</td>
+              <td>${escapeHTML(item.kayitSaati || '-')}</td>
+              <td class="font-bold text-[#000080]">${escapeHTML(item.irsaliyeNo)}</td>
+              <td>${escapeHTML(item.nakliye)}</td>
+              <td class="font-bold">${escapeHTML(item.plaka)}</td>
+              <td>${escapeHTML(item.aractipi)}</td>
+              <td>${escapeHTML(item.cikisLokasyon)}</td>
+              <td>${escapeHTML(item.varisLokasyon)}</td>
+              <td>${escapeHTML(item.cikisSehpaMiktari || '0')}</td>
+              <td>${escapeHTML(item.soforIsmi)}</td>
+              <td>
+                <div class="flex items-center gap-1">
+                  <button onclick="editRecord('${item.id}')" class="canias-btn" title="Düzenle"><i data-lucide="edit" class="w-3 h-3 text-blue-800"></i></button>
+                  <button onclick="exportRecordPDF('${item.id}')" class="canias-btn" title="PDF İndir"><i data-lucide="file-text" class="w-3 h-3 text-red-700"></i></button>
+                  ${currentUser?.role === 'admin' ? `<button onclick="deleteRecord('${item.id}')" class="canias-btn canias-btn-danger" title="Sil"><i data-lucide="trash" class="w-3 h-3"></i></button>` : ''}
+                </div>
+              </td>
+              <td>${escapeHTML(item.notlar)}</td>
+            </tr>
+        `;
+    });
+
+    const countEl = document.getElementById("quickTableCount");
+    if (countEl) countEl.innerText = `${total} kayıt`;
+    const ind = document.getElementById("quickPageIndicator");
+    if (ind) ind.innerText = `Sayfa ${quickPage} / ${totalPages}`;
+
+    if (window.lucide) lucide.createIcons();
+}
+
+function changeQuickPage(dir) {
+    const totalPages = Math.ceil(activeData.length / quickRowsPerPage) || 1;
+    if (dir === 'prev' && quickPage > 1) quickPage--;
+    else if (dir === 'next' && quickPage < totalPages) quickPage++;
+    renderQuickTable();
+}
+
+function onQuickRowsChange() {
+    const sel = document.getElementById("quickRowsPerPage");
+    quickRowsPerPage = parseInt(sel?.value || "10", 10);
+    quickPage = 1;
+    renderQuickTable();
+}
+
+function debouncedAdvancedSearch() {
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => executeAdvancedSearch(), 280);
+}
+
+function executeAdvancedSearch() {
+    const irsaliye = document.getElementById("searchIrsaliye")?.value.trim().toLocaleUpperCase('tr-TR') || "";
+    const plaka = document.getElementById("searchPlaka")?.value.trim().toLocaleUpperCase('tr-TR') || "";
+    const sofor = document.getElementById("searchSofor")?.value.trim().toLocaleUpperCase('tr-TR') || "";
+    const nakliye = document.getElementById("searchNakliye")?.value.trim().toLocaleUpperCase('tr-TR') || "";
+    const aracTipi = document.getElementById("searchAracTipi")?.value || "";
+    const tesis = document.getElementById("searchTesis")?.value || "HEPSİ";
+    const startDate = document.getElementById("startDate")?.value || "";
+    const endDate = document.getElementById("endDate")?.value || "";
+    const cikis = document.getElementById("searchCikis")?.value.trim().toLocaleUpperCase('tr-TR') || "";
+    const varis = document.getElementById("searchVaris")?.value.trim().toLocaleUpperCase('tr-TR') || "";
+
+    let filtered = [...dataset];
+
+    const isAdminUser = currentUser && (currentUser.role === "admin" || currentUser.role === "Sistem Yöneticisi (Admin)");
+    if (!isAdminUser && currentFacility !== "Tüm Tesisler") {
+        filtered = filtered.filter(d => d.tesis === currentFacility);
+    } else if (tesis !== "HEPSİ") {
+        filtered = filtered.filter(d => d.tesis === tesis);
+    }
+
+    if (irsaliye) filtered = filtered.filter(d => (d.irsaliyeNo || "").includes(irsaliye));
+    if (plaka) filtered = filtered.filter(d => (d.plaka || "").includes(plaka));
+    if (sofor) filtered = filtered.filter(d => (d.soforIsmi || "").includes(sofor));
+    if (nakliye) filtered = filtered.filter(d => (d.nakliye || "").includes(nakliye));
+    if (aracTipi) filtered = filtered.filter(d => d.aractipi === aracTipi);
+    if (startDate) filtered = filtered.filter(d => d.tarih >= startDate);
+    if (endDate) filtered = filtered.filter(d => d.tarih <= endDate);
+    if (cikis) filtered = filtered.filter(d => (d.cikisLokasyon || "").includes(cikis));
+    if (varis) filtered = filtered.filter(d => (d.varisLokasyon || "").includes(varis));
+
+    lastSearchResults = filtered;
+    currentPage = 1;
+    renderKPITable(filtered);
+}
+
+function resetFilter() {
+    ["searchIrsaliye", "searchPlaka", "searchSofor", "searchNakliye", "searchCikis", "searchVaris", "startDate", "endDate"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
+    if (document.getElementById("searchAracTipi")) document.getElementById("searchAracTipi").value = "";
+    if (document.getElementById("searchTesis")) document.getElementById("searchTesis").value = "HEPSİ";
+    currentPage = 1;
+    executeAdvancedSearch();
+}
+
+function renderKPITable(dataList) {
+    const tbody = document.getElementById("kpiTableBody");
+    const indicator = document.getElementById("pageIndicator");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+    const totalPages = Math.ceil(dataList.length / rowsPerPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIdx = (currentPage - 1) * rowsPerPage;
+    const pageItems = dataList.slice(startIdx, startIdx + rowsPerPage);
+
+    pageItems.forEach((item, index) => {
+        tbody.innerHTML += `
+            <tr>
+              <td>${startIdx + index + 1}</td>
+              <td>${escapeHTML(item.tarih)}</td>
+              <td>${escapeHTML(item.kayitSaati || '-')}</td>
+              <td class="font-bold text-[#000080]">${escapeHTML(item.irsaliyeNo)}</td>
+              <td>${escapeHTML(item.nakliye)}</td>
+              <td class="font-bold">${escapeHTML(item.plaka)}</td>
+              <td>${escapeHTML(item.aractipi)}</td>
+              <td>${escapeHTML(item.cikisLokasyon)}</td>
+              <td>${escapeHTML(item.varisLokasyon)}</td>
+              <td>${escapeHTML(item.cikisSehpaMiktari || '0')}</td>
+              <td>${escapeHTML(item.soforIsmi)}</td>
+              <td><span class="text-[10px] font-bold px-1 py-0.5 rounded bg-blue-50 border border-blue-200">${escapeHTML(item.tesis || '-')}</span></td>
+              <td>
+                <div class="flex items-center gap-1">
+                  <button onclick="editRecord('${item.id}')" class="canias-btn" title="Düzenle"><i data-lucide="edit" class="w-3 h-3 text-blue-800"></i></button>
+                  <button onclick="exportRecordPDF('${item.id}')" class="canias-btn" title="PDF İndir"><i data-lucide="file-text" class="w-3 h-3 text-red-700"></i></button>
+                  ${currentUser?.role === 'admin' ? `<button onclick="deleteRecord('${item.id}')" class="canias-btn canias-btn-danger" title="Sil"><i data-lucide="trash" class="w-3 h-3"></i></button>` : ''}
+                </div>
+              </td>
+              <td>${escapeHTML(item.notlar)}</td>
+            </tr>
+        `;
+    });
+
+    const countEl = document.getElementById("searchResultCount");
+    if (countEl) countEl.innerText = `${dataList.length} kayıt`;
+    if (indicator) indicator.innerText = `Sayfa ${currentPage} / ${totalPages}`;
+    if (window.lucide) lucide.createIcons();
+}
+
+function changePage(dir) {
+    const totalPages = Math.ceil((lastSearchResults.length || 0) / rowsPerPage) || 1;
+    if (dir === 'prev' && currentPage > 1) currentPage--;
+    else if (dir === 'next' && currentPage < totalPages) currentPage++;
+    renderKPITable(lastSearchResults);
+}
+
+function onSearchRowsChange() {
+    const sel = document.getElementById("searchRowsPerPage");
+    rowsPerPage = parseInt(sel?.value || "10", 10);
+    currentPage = 1;
+    renderKPITable(lastSearchResults);
+}
+
+function exportSearchToExcel() {
+    const data = lastSearchResults.length ? lastSearchResults : dataset;
+    if (!data.length) {
+        alert("Dışa aktarılacak kayıt bulunamadı!");
+        return;
+    }
+    let csv = "\uFEFF";
+    csv += "Sira\tTarih\tSaat\tIrsaliye No\tNakliye\tPlaka\tArac Tipi\tCikis\tVaris\tSehpa\tSofor\tTesis\tNotlar\n";
+    data.forEach((item, i) => {
+        csv += `${i + 1}\t${item.tarih}\t${item.kayitSaati || '-'}\t${item.irsaliyeNo}\t${item.nakliye}\t${item.plaka}\t${item.aractipi}\t${item.cikisLokasyon}\t${item.varisLokasyon}\t${item.cikisSehpaMiktari || '0'}\t${item.soforIsmi}\t${item.tesis || ''}\t${item.notlar}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `BPO_Arama_Sonuclari_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    showToast("Arama sonuçları Excel'e aktarıldı.");
+}
+
+function executeIrsaliyeSearch() {
+    const query = document.getElementById("irsaliyeSearchInput")?.value.trim().toLocaleUpperCase('tr-TR');
+    const container = document.getElementById("irsaliyeResultContainer");
+    const content = document.getElementById("irsaliyeCardContent");
+
+    if (!query) {
+        alert("Lütfen aramak istediğiniz irsaliye numarasını giriniz.");
+        return;
+    }
+
+    const matches = dataset.filter(d => d.irsaliyeNo.includes(query));
+
+    if (matches.length > 0) {
+        container.classList.remove("hidden");
+        content.innerHTML = matches.map(m => `
+            <div class="p-3 border border-[#7f9db9] rounded bg-[#f5f4ea] space-y-1">
+              <div class="flex justify-between items-center border-b pb-1">
+                <span class="font-bold text-sm text-[#000080]">${escapeHTML(m.irsaliyeNo)}</span>
+                <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-300">${escapeHTML(m.tesis)}</span>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs pt-1">
+                <div><strong>Tarih / Saat:</strong> ${escapeHTML(m.tarih)} - ${escapeHTML(m.kayitSaati || '-')}</div>
+                <div><strong>Plaka / Nakliye:</strong> ${escapeHTML(m.plaka)} / ${escapeHTML(m.nakliye)}</div>
+                <div><strong>Güzergah:</strong> ${escapeHTML(m.cikisLokasyon)} ➔ ${escapeHTML(m.varisLokasyon)}</div>
+                <div><strong>Şoför:</strong> ${escapeHTML(m.soforIsmi)}</div>
+                <div><strong>Araç Tipi:</strong> ${escapeHTML(m.aractipi)}</div>
+                <div><strong>Sehpa Miktarı:</strong> ${escapeHTML(m.cikisSehpaMiktari || '0')}</div>
+                <div class="col-span-2"><strong>Notlar:</strong> ${escapeHTML(m.notlar)}</div>
+              </div>
+            </div>
+        `).join("");
+    } else {
+        container.classList.remove("hidden");
+        content.innerHTML = `<div class="p-3 text-red-700 font-bold text-center">Aramanıza uygun irsaliye kaydı bulunamadı!</div>`;
+    }
+}
+
+function setDefaultTeyitDates() {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const format = (d) => d.toISOString().slice(0, 10);
+
+    const sEl = document.getElementById("teyitStartDate");
+    const eEl = document.getElementById("teyitEndDate");
+
+    if (sEl) sEl.value = format(startOfMonth);
+    if (eEl) eEl.value = format(today);
+}
+
+function debouncedTeyitRender() {
+    if (teyitDebounceTimer) clearTimeout(teyitDebounceTimer);
+    teyitDebounceTimer = setTimeout(() => {
+        renderTeyitSection();
+    }, 300);
+}
+
+function renderTeyitSection() {
+    const sDate = document.getElementById("teyitStartDate")?.value || "";
+    const eDate = document.getElementById("teyitEndDate")?.value || "";
+    const tbody = document.getElementById("teyitTableBody");
+
+    if (!tbody) return;
+
+    const companySel = document.getElementById("teyitCompanyFilter");
+    const selectedCompany = companySel?.value || "ALL";
+    const companies = [...new Set(dataset.map(d => d.nakliye).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"tr"));
+    if (companySel) {
+        const keep = companySel.value || "ALL";
+        companySel.innerHTML = `<option value="ALL">Tüm Firmalar</option>` + companies.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("");
+        companySel.value = companies.includes(keep) ? keep : "ALL";
+    }
+
+    let filtered = [...dataset];
+
+    if (sDate) filtered = filtered.filter(d => d.tarih >= sDate);
+    if (eDate) filtered = filtered.filter(d => d.tarih <= eDate);
+    if (selectedCompany !== "ALL") filtered = filtered.filter(d => d.nakliye === selectedCompany);
+
+    lastTeyitResults = filtered;
+
+    let totalTrips = filtered.length;
+    let osbCount = filtered.filter(d => (d.cikisLokasyon + d.varisLokasyon).includes("OSB")).length;
+    let yakitCount = filtered.filter(d => (d.cikisLokasyon + d.varisLokasyon + d.tesis).includes("YAKIT")).length;
+    let renaultCount = filtered.filter(d => (d.cikisLokasyon + d.varisLokasyon).includes("RENAULT")).length;
+    let karsanCount = filtered.filter(d => (d.cikisLokasyon + d.varisLokasyon).includes("KARSAN")).length;
+
+    document.getElementById("teyitTotalVehicles").innerText = totalTrips;
+    document.getElementById("teyitOsbCount").innerText = osbCount;
+    document.getElementById("teyitYakitCount").innerText = yakitCount;
+    document.getElementById("teyitRenaultCount").innerText = renaultCount;
+    document.getElementById("teyitKarsanCount").innerText = karsanCount;
+
+    const totalPages = Math.ceil(filtered.length / teyitRowsPerPage) || 1;
+    if (teyitPage > totalPages) teyitPage = totalPages;
+    if (teyitPage < 1) teyitPage = 1;
+    const startIdx = (teyitPage - 1) * teyitRowsPerPage;
+    const pageItems = filtered.slice(startIdx, startIdx + teyitRowsPerPage);
+
+    tbody.innerHTML = "";
+    pageItems.forEach((item, idx) => {
+        tbody.innerHTML += `
+            <tr>
+              <td>${startIdx + idx + 1}</td>
+              <td>${escapeHTML(item.tarih)}</td>
+              <td class="font-bold text-green-800">${escapeHTML(item.nakliye || "-")}</td>
+              <td>${escapeHTML(item.kayitSaati || '-')}</td>
+              <td class="font-bold text-[#000080]">${escapeHTML(item.irsaliyeNo)}</td>
+              <td class="font-bold">${escapeHTML(item.plaka)}</td>
+              <td>${escapeHTML(item.aractipi)}</td>
+              <td>${escapeHTML(item.cikisLokasyon)}</td>
+              <td>${escapeHTML(item.varisLokasyon)}</td>
+              <td>${escapeHTML(item.soforIsmi)}</td>
+              <td>${escapeHTML(item.notlar)}</td>
+            </tr>
+        `;
+    });
+
+    const countEl = document.getElementById("teyitListCount");
+    if (countEl) countEl.innerText = `${filtered.length} kayıt`;
+    const ind = document.getElementById("teyitPageIndicator");
+    if (ind) ind.innerText = `Sayfa ${teyitPage} / ${totalPages}`;
+}
+
+function changeTeyitPage(dir) {
+    const totalPages = Math.ceil((lastTeyitResults.length || 0) / teyitRowsPerPage) || 1;
+    if (dir === 'prev' && teyitPage > 1) teyitPage--;
+    else if (dir === 'next' && teyitPage < totalPages) teyitPage++;
+    renderTeyitSection();
+}
+
+function onTeyitRowsChange() {
+    const sel = document.getElementById("teyitRowsPerPage");
+    teyitRowsPerPage = parseInt(sel?.value || "25", 10);
+    teyitPage = 1;
+    renderTeyitSection();
+}
+
+function exportTeyitToExcel() {
+    const sDate = document.getElementById("teyitStartDate")?.value || "";
+    const eDate = document.getElementById("teyitEndDate")?.value || "";
+    const company = document.getElementById("teyitCompanyFilter")?.value || "ALL";
+    let filtered = [...dataset];
+    if (sDate) filtered = filtered.filter(d => d.tarih >= sDate);
+    if (eDate) filtered = filtered.filter(d => d.tarih <= eDate);
+    if (company !== "ALL") filtered = filtered.filter(d => d.nakliye === company);
+    if (!filtered.length) { alert("Dışa aktarılacak kayıt bulunamadı!"); return; }
+
+    const clean = v => String(v ?? "").replace(/\r?\n/g, " ").replace(/"/g, '""');
+    const rows = [
+      ["Sıra No","Tarih","Firma","Saat","İrsaliye No","Plaka","Araç Tipi","Çıkış Lokasyonu","Varış Lokasyonu","Şoför","Notlar"]
+    ];
+    filtered.forEach((item,index)=>rows.push([index+1,item.tarih,item.nakliye,item.kayitSaati||"-",item.irsaliyeNo,item.plaka,item.aractipi,item.cikisLokasyon,item.varisLokasyon,item.soforIsmi,item.notlar]));
+    const csv = "\\uFEFF" + rows.map(r => r.map(v => `"${clean(v)}"`).join(";")).join("\\r\\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+    const link=document.createElement("a"), url=URL.createObjectURL(blob);
+    link.href=url; link.download=`BPO_Teyit_${sDate}_${eDate}${company!=="ALL"?"_"+company.replace(/[^\\w\\-çğıöşüÇĞİÖŞÜ]/g,"_"):""}.csv`;
+    document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+    showToast("Teyit listesi Excel uyumlu sütunlara aktarıldı.");
+}
+
+function openExcelModal() {
+    document.getElementById("excelPasteModal")?.classList.remove("hidden");
+    document.getElementById("excelPasteInput").value = "";
+    document.getElementById("excelPasteInput")?.focus();
+}
+
+function closeExcelModal() {
+    document.getElementById("excelPasteModal")?.classList.add("hidden");
+}
+
+function processExcelPaste() {
+    const rawText = document.getElementById("excelPasteInput").value.trim();
+    if (!rawText) {
+        alert("Lütfen yapıştırılacak veriyi giriniz!");
+        return;
+    }
+
+    const lines = rawText.split('\n');
+    let addedCount = 0;
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+    lines.forEach(line => {
+        const parts = line.split('\t');
+        if (parts.length >= 2) {
+            dataset.unshift({
+                id: generateUUID(),
+                tesis: currentFacility,
+                tarih: dateStr,
+                kayitSaati: timeStr,
+                irsaliyeNo: formatTR(parts[0] || ''),
+                nakliye: formatTR(parts[1] || ''),
+                plaka: formatTR(parts[2] || ''),
+                aractipi: formatTR(parts[3] || 'TIR'),
+                cikisLokasyon: formatTR(parts[4] || ''),
+                varisLokasyon: formatTR(parts[5] || ''),
+                cikisSehpaMiktari: "0",
+                soforIsmi: formatTR(parts[6] || ''),
+                notlar: formatTR(parts[7] || 'Excel Toplu Aktarım')
+            });
+            addedCount++;
+        }
+    });
+
+    saveToLocalStorage();
+    closeExcelModal();
+    filterDataByFacility();
+    renderAll();
+    showToast(`${addedCount} adet kayıt başarıyla aktarıldı!`);
+}
+
+function renderAdminTables() {
+    renderPendingUsers();
+    renderAllUsers();
+    renderPlakaList();}
+
+function renderPendingUsers() {
+    const tbody = document.getElementById("pendingUserTableBody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+    const pending = usersList.filter(u => u.status === "pending");
+
+    if (pending.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 italic">Bekleyen üyelik talebi bulunmuyor.</td></tr>`;
+        return;
+    }
+
+    pending.forEach(u => {
+        tbody.innerHTML += `
+            <tr>
+              <td class="font-bold">${escapeHTML(u.name)}</td>
+              <td>${escapeHTML(u.username)}</td>
+              <td>${escapeHTML(u.phone)}</td>
+              <td>${escapeHTML(u.email)}</td>
+              <td>${escapeHTML(u.facility)}</td>
+              <td>
+                <div class="flex gap-1">
+                  <button onclick="approveUser('${u.username}')" class="canias-btn canias-btn-success"><i data-lucide="check" class="w-3 h-3"></i> Onayla</button>
+                  <button onclick="rejectUser('${u.username}')" class="canias-btn canias-btn-danger"><i data-lucide="x" class="w-3 h-3"></i> Reddet</button>
+                </div>
+              </td>
+            </tr>
+        `;
+    });
+    if (window.lucide) lucide.createIcons();
+}
+
+function renderAllUsers() {
+    const tbody = document.getElementById("userTableBody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    usersList.forEach(u => {
+        tbody.innerHTML += `
+            <tr>
+              <td class="font-bold">${escapeHTML(u.name)}</td>
+              <td>${escapeHTML(u.username)}</td>
+              <td>${escapeHTML(u.phone)}</td>
+              <td>${escapeHTML(u.email)}</td>
+              <td>${escapeHTML(u.facility)}</td>
+              <td><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${u.status === 'approved' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}">${u.status}</span></td>
+              <td class="font-bold text-[#000080]">${escapeHTML(u.role)}</td>
+              <td><span class="text-[9px] text-gray-500">Hash'li / gizli</span></td>
+              <td>
+                <div class="flex gap-1 flex-wrap">
+                  <button onclick="messageUser('${u.username}')" class="canias-btn" title="Mesaj Gönder"><i data-lucide="message-square" class="w-3 h-3"></i> Mesaj</button>
+                  <button onclick="editUser('${u.username}')" class="canias-btn" title="Üyeliği Düzenle"><i data-lucide="user-cog" class="w-3 h-3"></i> Düzenle</button>
+                  ${u.username !== 'admin' ? `<button onclick="deleteUser('${u.username}')" class="canias-btn canias-btn-danger" title="Kullanıcı Sil"><i data-lucide="trash" class="w-3 h-3"></i> Sil</button>` : ''}
+                </div>
+              </td>
+            </tr>
+        `;
+    });
+    if (window.lucide) lucide.createIcons();
+}
+
+async function approveUser(username) {
+    if (!requireAdmin("Kullanıcı onaylama")) return;
+    const user = usersList.find(u => u.username === username);
+    if (user) {
+        user.status = "approved";
+        await Backend.saveUsers();
+        await Backend.persistAll();
+        addAudit("KULLANICI_ONAY", username);
+        renderAdminTables();
+        showToast("Kullanıcı Onaylandı!");
+    }
+}
+
+async function rejectUser(username) {
+    if (!requireAdmin("Kullanıcı reddetme")) return;
+    const user = usersList.find(u => u.username === username);
+    if (user) {
+        user.status = "rejected";
+        await Backend.saveUsers();
+        await Backend.persistAll();
+        addAudit("KULLANICI_RED", username);
+        renderAdminTables();
+        showToast("Kullanıcı Talebi Reddedildi!");
+    }
+}
+
+async function deleteUser(username) {
+    if (!requireAdmin("Kullanıcı silme")) return;
+    if (username === "admin") { alert("admin kullanıcısı silinemez."); return; }
+    if (confirm(`${username} kullanıcısını silmek istediğinize emin misiniz?`)) {
+        usersList = usersList.filter(u => u.username !== username);
+        await Backend.saveUsers();
+        await Backend.persistAll();
+        addAudit("KULLANICI_SİL", username);
+        renderAdminTables();
+        showToast("Kullanıcı Silindi!");
+    }
+}
+
+function messageUser(username) {
+    if (!requireAdmin("Kullanıcıya mesaj gönderme")) return;
+    const user = usersList.find(u => u.username === username);
+    if (!user) return;
+    toggleChatModal();
+    const sel = document.getElementById("chatTargetSelect");
+    if (sel) { sel.value = username; chatTarget = username; }
+    onChatTargetChange();
+}
+
+async function editUser(username) {
+    if (!requireAdmin("Kullanıcı üyeliği düzenleme")) return;
+    const u = usersList.find(x => x.username === username);
+    if (!u) return;
+    const name = prompt("Ad Soyad:", u.name || ""); if (name === null) return;
+    const phone = prompt("Telefon:", u.phone || ""); if (phone === null) return;
+    const email = prompt("E-posta:", u.email || ""); if (email === null) return;
+    const facility = prompt("Tesis:", u.facility || ""); if (facility === null) return;
+    const role = prompt("Rol:", u.role || ""); if (role === null) return;
+    const newPass = prompt("Yeni parola (boş bırakırsanız mevcut parola korunur):", "");
+    u.name=name.trim(); u.phone=phone.trim(); u.email=email.trim(); u.facility=facility.trim(); u.role=role.trim();
+    if (newPass && newPass.length >= 4) u.pass = await hashPassword(newPass.trim());
+    else if (newPass) { alert("Yeni parola en az 4 karakter olmalıdır; parola değiştirilmedi."); }
+    await Backend.saveUsers(); await Backend.persistAll();
+    addAudit("KULLANICI_DÜZENLE", username);
+    renderAdminTables(); showToast("Kullanıcı üyeliği güncellendi.");
+}
+
+async function handleAdminCreateUser(e) {
+    e.preventDefault();
+    if (!requireAdmin("Kullanıcı oluşturma")) return;
+    const name = document.getElementById("adminCreateName").value.trim();
+    const username = document.getElementById("adminCreateUser").value.trim().toLocaleLowerCase("tr-TR");
+    const plainPass = document.getElementById("adminCreatePass").value.trim();
+    const phone = document.getElementById("adminCreatePhone").value.trim();
+    const email = document.getElementById("adminCreateEmail").value.trim();
+    const role = document.getElementById("adminCreateRole").value;
+
+    if (!plainPass || plainPass.length < 4) {
+        alert("Parola en az 4 karakter olmalıdır!");
+        return;
+    }
+    if (phone && !isValidPhone(phone)) {
+        alert("Telefon formatı geçersiz!\nÖrnek: 05XX XXX XX XX");
+        return;
+    }
+    if (usersList.some(u => u.username.toLocaleLowerCase("tr-TR") === username)) {
+        alert("Bu kullanıcı adı zaten mevcut!");
+        return;
+    }
+
+    const hashedPass = await hashPassword(plainPass);
+    usersList.push({
+        name, username, pass: hashedPass, phone, email, role,
+        facility: role === "Yakıt Sistemleri" ? "Yakıt Sistemleri" : "Tüm Tesisler",
+        status: "approved", lastSeen: 0
+    });
+
+    await Backend.saveUsers();
+    await Backend.persistAll();
+    renderAdminTables();
+    addAudit("KULLANICI_OLUŞTUR", username);
+    showToast("Yeni Kullanıcı Oluşturuldu!");
+    e.target.reset();
+}
+
+function renderPlakaList() {
+    const listDiv = document.getElementById("adminPlakaList");
+    if (!listDiv) return;
+
+    listDiv.innerHTML = "";
+    allowedPlakalar.forEach(p => {
+        listDiv.innerHTML += `
+            <div class="bg-gray-100 border border-[#7f9db9] px-2 py-0.5 rounded flex items-center gap-1.5 font-bold text-xs">
+              <span>${escapeHTML(p)}</span>
+              <button onclick="adminRemovePlaka('${p}')" class="text-red-700 font-black hover:text-red-900">&times;</button>
+            </div>
+        `;
+    });
+}
+
+async function adminAddPlaka() {
+    if (!requireAdmin("Plaka ekleme")) return;
+    const input = document.getElementById("adminNewPlakaInput");
+    const val = formatTR(input?.value || "");
+    if (!val) return;
+
+    if (allowedPlakalar.includes(val)) {
+        alert("Bu plaka zaten kayıtlı!");
+        return;
+    }
+
+    allowedPlakalar.push(val);
+    await Backend.savePlakalar();
+    await Backend.persistAll();
+    renderPlakaList();
+    if (input) input.value = "";
+    showToast("Plaka Eklendi!");
+}
+
+async function adminRemovePlaka(plaka) {
+    if (!requireAdmin("Plaka silme")) return;
+    allowedPlakalar = allowedPlakalar.filter(p => p !== plaka);
+    await Backend.savePlakalar();
+    await Backend.persistAll();
+    renderPlakaList();
+    showToast("Plaka Silindi!");
+}
+
+async function adminClearCurrentFacilityData() {
+    if (!requireAdmin("Tesis verilerini temizleme")) return;
+    if (confirm(`${currentFacility} tesisine ait TÜM verileri silmek istediğinize emin misiniz? Bu işlem geri alınamaz!`)) {
+        const toDelete = dataset.filter(d => d.tesis === currentFacility);
+        dataset = dataset.filter(d => d.tesis !== currentFacility);
+        for (const r of toDelete) await Backend.deleteTrip(r.id);
+        await Backend.persistAll();
+        addAudit("TESİS_TEMİZLE", currentFacility + " · " + toDelete.length + " kayıt");
+        filterDataByFacility();
+        renderAll();
+        showToast("Tesis Verileri Temizlendi!");
+    }
+}
+
+async function adminResetAllToDefault() {
+    if (!requireAdmin("Fabrika ayarlarına dönüş")) return;
+    if (confirm("Tüm veritabanını varsayılan fabrika ayarlarına döndürmek istediğinize emin misiniz? Bütün veriler sıfırlanacaktır!")) {
+        const keepTheme = localStorage.getItem("bpo_theme");
+        localStorage.clear();
+        if (keepTheme) localStorage.setItem("bpo_theme", keepTheme);
+        dataset = [];
+        usersList = JSON.parse(JSON.stringify(initialUsers));
+        allowedPlakalar = [...initialPlakalar];
+        chatMessages = [];
+        auditLog = [];
+        await Backend.saveUsers();
+        await Backend.savePlakalar();
+        await Backend.persistAll();
+        location.reload();
+    }
+}
+
+
+/* ======================================================================
+   BPO CLOUD / VERCEL + SUPABASE LAYER
+   Bu katman eski localStorage veri katmanının yerine geçer.
+   ====================================================================== */
+let bpoSupabase = null;
+let bpoToken = sessionStorage.getItem("bpo_session_token") || "";
+let bpoSessionId = sessionStorage.getItem("bpo_session_id") || generateUUID();
+sessionStorage.setItem("bpo_session_id", bpoSessionId);
+
+async function bpoInitCloud() {
+  try {
+    const cfg = await fetch('/api/config', { cache: 'no-store' }).then(r => r.json());
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error('Vercel/Supabase ayarları eksik.');
+    bpoSupabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth: { persistSession:false, autoRefreshToken:false } });
+    bpoSubscribeRealtime();
+    return true;
+  } catch (e) { console.error('Cloud başlatılamadı', e); showToast('Sunucu bağlantısı kurulamadı.'); return false; }
+}
+
+async function bpoApi(path, options={}) {
+  const headers = { 'Content-Type':'application/json', ...(options.headers||{}) };
+  if (bpoToken) headers.Authorization = 'Bearer ' + bpoToken;
+  const r = await fetch(path, { ...options, headers });
+  const data = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+  return data;
+}
+
+function bpoApplyState(state) {
+  if (!state) return;
+  if (Array.isArray(state.dataset)) dataset = state.dataset;
+  if (Array.isArray(state.usersList)) usersList = state.usersList;
+  if (Array.isArray(state.allowedPlakalar)) allowedPlakalar = state.allowedPlakalar;
+  if (Array.isArray(state.chatMessages)) chatMessages = state.chatMessages;
+  if (Array.isArray(state.auditLog)) auditLog = state.auditLog;
+  window.bpoPresence = state.presence || [];
+}
+
+async function bpoReload() {
+  if (!bpoToken) return;
+  try { const state = await bpoApi('/api/state'); bpoApplyState(state); filterDataByFacility(); renderAll(); renderUserStatuses(); populateChatTargets(); renderChatMessages(); }
+  catch(e){ console.error('Cloud veri yenileme:',e); }
+}
+
+function bpoSubscribeRealtime() {
+  if (!bpoSupabase) return;
+  bpoSupabase.channel('bpo-live')
+    .on('broadcast',{event:'changed'},()=>bpoReload())
+    .on('broadcast',{event:'typing'},payload=>{ window.bpoTypingPayload = payload.payload; checkTypingIndicator(); })
+    .subscribe();
+}
+
+const Backend = {
+  async loadAll(){
+    if(!bpoSupabase) await bpoInitCloud();
+    if(!bpoToken) { dataset=[]; usersList=[]; allowedPlakalar=[...initialPlakalar]; chatMessages=[]; auditLog=[]; return true; }
+    const state=await bpoApi('/api/state'); bpoApplyState(state); return true;
+  },
+  async upsertTrip(r){ await bpoApi('/api/state',{method:'POST',body:JSON.stringify({action:'upsertTrip',data:r})}); return true; },
+  async deleteTrip(id){ await bpoApi('/api/state',{method:'POST',body:JSON.stringify({action:'deleteTrip',id})}); return true; },
+  async saveTrips(){ for(const r of dataset) await this.upsertTrip(r); return true; },
+  async saveUsers(){ await bpoApi('/api/state',{method:'POST',body:JSON.stringify({action:'saveUsers',users:usersList})}); return true; },
+  async savePlakalar(){ await bpoApi('/api/state',{method:'POST',body:JSON.stringify({action:'savePlates',plates:allowedPlakalar})}); return true; },
+  async saveChat(){ await bpoApi('/api/state',{method:'POST',body:JSON.stringify({action:'saveChat',messages:chatMessages})}); return true; },
+  async saveAudit(){ await bpoApi('/api/state',{method:'POST',body:JSON.stringify({action:'saveAudit',audit:auditLog})}); return true; },
+  async persistAll(){ return true; },
+  async subscribeRealtime(){ bpoSubscribeRealtime(); return true; }
+};
+
+async function cloudLogin(username,password){
+  const result=await bpoApi('/api/login',{method:'POST',body:JSON.stringify({username,password})});
+  bpoToken=result.token; sessionStorage.setItem('bpo_session_token',bpoToken);
+  currentUser=result.user;
+  await bpoReload();
+  return result.user;
+}
+
+async function cloudRegister(user){ return bpoApi('/api/register',{method:'POST',body:JSON.stringify({user})}); }
+
+async function cloudHeartbeat(){
+  if(!bpoToken || !currentUser) return;
+  try { await bpoApi('/api/heartbeat',{method:'POST',body:JSON.stringify({sessionId:bpoSessionId,name:currentUser.name,facility:currentFacility})}); } catch(e) {}
+}
+
+// Gerçek zamanlı çevrim içi durumunu DB'deki presence tablosundan hesaplar.
+function renderUserStatuses(){
+  const container=document.getElementById('userStatusBadges'); const badge=document.getElementById('onlineCountBadge');
+  if(!container) return;
+  const now=Date.now(); const pres=window.bpoPresence||[]; const online=new Map();
+  pres.forEach(p=>{ const t=Date.parse(p.last_seen||0); if(now-t<30000) online.set(p.username,p); });
+  let onlineCount=0; container.innerHTML='';
+  usersList.forEach(u=>{ const isOnline=online.has(u.username); if(isOnline) onlineCount++; container.innerHTML += `<div class="flex justify-between items-center p-1.5 bg-white border border-[#7f9db9] rounded"><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ${isOnline?'bg-green-600 animate-pulse':'bg-gray-400'}"></span><span class="font-bold">${escapeHTML(u.name)}</span><span class="text-[9px] text-gray-500">(${escapeHTML(u.username)})</span></div><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${isOnline?'bg-green-200 text-green-800':'bg-gray-200 text-gray-700'}">${isOnline?'Çevrim İçi':'Çevrim Dışı'}</span></div>`; });
+  if(badge) badge.innerText=onlineCount;
+}
+
+// Login ekranındaki eski localStorage tabanlı girişi sunucu oturumuna çevirir.
+async function handleLogin(e){
+  e.preventDefault(); hideAuthErrors(); touchActivity();
+  const user=document.getElementById('loginUser').value.trim().toLocaleLowerCase('tr-TR');
+  const pass=document.getElementById('loginPass').value;
+  try{
+    await cloudLogin(user,pass);
+    if(currentUser.status && currentUser.status!=='approved'){ document.getElementById('loginPendingError')?.classList.remove('hidden'); return; }
+    document.getElementById('authScreen')?.classList.add('hidden'); document.getElementById('mainApp')?.classList.remove('hidden');
+    document.getElementById('currentUserDisplay').innerText=currentUser.name; document.getElementById('currentUserRole').innerText=currentUser.role;
+    adjustFacilitySelectionButtons(); updateTabVisibility(); startUserHeartbeat(); startSessionWatchdog();
+    filterDataByFacility(); renderAll(); renderUserStatuses();
+    await cloudHeartbeat(); showToast('Oturum açıldı.');
+  }catch(err){ console.error(err); document.getElementById('loginError')?.classList.remove('hidden'); }
+}
+
+async function handleRegister(e){
+  e.preventDefault();
+  const name=document.getElementById('regName').value.trim(); const phone=document.getElementById('regPhone').value.trim(); const email=document.getElementById('regEmail').value.trim(); const facility=document.getElementById('regFacility').value; const username=document.getElementById('regUser').value.trim().toLocaleLowerCase('tr-TR'); const plainPass=document.getElementById('regPass').value;
+  if(!username||!plainPass||plainPass.length<4){alert('Kullanıcı adı ve en az 4 karakter parola gerekli.');return;}
+  try{ await cloudRegister({name,phone,email,facility,username,pass:plainPass,role:facility==='Yakıt Sistemleri'?'Yakıt Sistemleri':'Sevkiyat Sorumlusu'}); alert('Kayıt talebiniz iletildi. Admin onayından sonra giriş yapabilirsiniz.'); switchAuthMode('login'); }catch(err){ alert('Kayıt yapılamadı: '+err.message); }
+}
+
+function logout(){
+  if(currentUser) addAudit('ÇIKIŞ',currentUser.username); currentUser=null; bpoToken=''; sessionStorage.removeItem('bpo_session_token'); formDirty=false; if(userHeartbeatInterval)clearInterval(userHeartbeatInterval); if(sessionTimeoutInterval)clearInterval(sessionTimeoutInterval); document.getElementById('mainApp')?.classList.add('hidden'); document.getElementById('authScreen')?.classList.remove('hidden');
+}
+
+// Sohbeti DB + Realtime'a taşır.
+async function sendChatMessage(){
+  const input=document.getElementById('chatInputMessage'); if(!input||!input.value.trim()||!currentUser)return;
+  const target=document.getElementById('chatTargetSelect')?.value||'ALL'; const targetUser=target!=='ALL'?usersList.find(u=>u.username===target):null;
+  const msg={id:generateUUID(),sender:currentUser.username,senderName:currentUser.name,to:target,toName:targetUser?targetUser.name:'Herkes',text:input.value.trim(),time:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),timestamp:Date.now(),readBy:[currentUser.username]};
+  chatMessages.push(msg); if(chatMessages.length>1000)chatMessages=chatMessages.slice(-1000); input.value=''; try{await Backend.saveChat();renderChatMessages();}catch(e){alert('Mesaj gönderilemedi: '+e.message);}
+}
+
+function onChatTyping(){
+  if(!currentUser||!bpoSupabase)return; const now=Date.now(); if(now-lastTypingBroadcast<700)return; lastTypingBroadcast=now; const payload={user:currentUser.username,name:currentUser.name,to:document.getElementById('chatTargetSelect')?.value||'ALL',at:now}; bpoSupabase.channel('bpo-live').send({type:'broadcast',event:'typing',payload});
+}
+function checkTypingIndicator(){
+  const el=document.getElementById('chatTypingIndicator'); const t=window.bpoTypingPayload; if(!el||!currentUser||!t||t.user===currentUser.username||Date.now()-(t.at||0)>4000){el?.classList.add('hidden');return;} const target=document.getElementById('chatTargetSelect')?.value||'ALL'; if(t.to==='ALL'||t.to===currentUser.username||target===t.user){el.innerText=`${t.name||t.user} yazıyor...`;el.classList.remove('hidden');}else el.classList.add('hidden');
+}
+
+// Her 4 saniyede heartbeat; ayrıca Realtime değişiklikleri geldiğinde state otomatik yenilenir.
+function startUserHeartbeat(){ if(userHeartbeatInterval)clearInterval(userHeartbeatInterval); cloudHeartbeat(); userHeartbeatInterval=setInterval(async()=>{await cloudHeartbeat(); await bpoReload(); renderUserStatuses(); checkNewChatNotification(); checkTypingIndicator();},4000); }
+
+// Sayfa açılışında Supabase istemcisini hazırla; login öncesi sadece config/realtime bağlantısı kurulur.
+(async()=>{ await bpoInitCloud(); })();
+
+async function editUser(username){
+  if(!requireAdmin('Kullanıcı üyeliği düzenleme'))return;
+  const u=usersList.find(x=>x.username===username); if(!u)return;
+  const name=prompt('Ad Soyad:',u.name||''); if(name===null)return;
+  const phone=prompt('Telefon:',u.phone||''); if(phone===null)return;
+  const email=prompt('E-posta:',u.email||''); if(email===null)return;
+  const facility=prompt('Tesis:',u.facility||''); if(facility===null)return;
+  const role=prompt('Rol:',u.role||''); if(role===null)return;
+  const newPass=prompt('Yeni parola (boş bırakırsanız mevcut parola korunur):','');
+  u.name=name.trim();u.phone=phone.trim();u.email=email.trim();u.facility=facility.trim();u.role=role.trim();
+  if(newPass&&newPass.length<4){alert('Yeni parola en az 4 karakter olmalıdır; parola değiştirilmedi.');return;}
+  if(newPass) u.pass=newPass.trim();
+  await Backend.saveUsers(); addAudit('KULLANICI_DÜZENLE',username); renderAdminTables(); showToast('Kullanıcı üyeliği güncellendi.');
+}
+async function handleAdminCreateUser(e){
+  e.preventDefault(); if(!requireAdmin('Kullanıcı oluşturma'))return;
+  const name=document.getElementById('adminCreateName').value.trim(); const username=document.getElementById('adminCreateUser').value.trim().toLocaleLowerCase('tr-TR'); const plainPass=document.getElementById('adminCreatePass').value.trim(); const phone=document.getElementById('adminCreatePhone').value.trim(); const email=document.getElementById('adminCreateEmail').value.trim(); const role=document.getElementById('adminCreateRole').value;
+  if(!plainPass||plainPass.length<4){alert('Parola en az 4 karakter olmalıdır!');return;}
+  if(usersList.some(u=>u.username.toLocaleLowerCase('tr-TR')===username)){alert('Bu kullanıcı adı zaten mevcut!');return;}
+  const u={name,username,pass:plainPass,phone,email,role,facility:role==='Yakıt Sistemleri'?'Yakıt Sistemleri':'Tüm Tesisler',status:'approved',lastSeen:0};
+  try{usersList.push(u);await Backend.saveUsers();addAudit('KULLANICI_OLUŞTUR',username);renderAdminTables();e.target.reset();showToast('Kullanıcı oluşturuldu.');}catch(err){usersList=usersList.filter(x=>x.username!==username);alert('Kullanıcı oluşturulamadı: '+err.message);}
+}
+
+async function addAudit(action,detail=''){
+  auditLog.unshift({id:generateUUID(),time:new Date().toLocaleString('tr-TR'),user:currentUser?currentUser.username:'sistem',name:currentUser?currentUser.name:'Sistem',action,detail:String(detail).slice(0,200),tesis:currentFacility||'-'});
+  if(auditLog.length>500)auditLog=auditLog.slice(0,500);
+  try{await Backend.saveAudit();}catch(e){console.error('Audit kaydı:',e);}
+}
+async function markChatAsRead(){
+  if(!currentUser||!chatMessages.length)return; let changed=false;
+  chatMessages.forEach(m=>{if(!m.readBy)m.readBy=[];const forMe=!m.to||m.to==='ALL'||m.to===currentUser.username;if(forMe&&m.sender!==currentUser.username&&!m.readBy.includes(currentUser.username)){m.readBy.push(currentUser.username);changed=true;}});
+  if(changed)try{await Backend.saveChat();renderChatMessages();}catch(e){}
+}
+function checkNewChatNotification(){
+  if(!currentUser)return; const count=chatMessages.filter(m=>m.sender!==currentUser.username&&(!m.to||m.to==='ALL'||m.to===currentUser.username)).length;
+  if(count>lastChatCount){const msg=chatMessages[chatMessages.length-1]; if(msg&&msg.sender!==currentUser.username)notifyIncomingChat(msg,count-lastChatCount);}
+  lastChatCount=count;
+}
+async function importJSONBackup(event){
+  const file=event.target.files?.[0];if(!file)return;
+  try{const imported=JSON.parse(await file.text());if(!Array.isArray(imported.dataset))throw new Error('Geçersiz yedek dosyası.');
+    dataset=imported.dataset; if(Array.isArray(imported.usersList))usersList=imported.usersList; if(Array.isArray(imported.allowedPlakalar))allowedPlakalar=imported.allowedPlakalar;
+    for(const r of dataset)await Backend.upsertTrip(r); await Backend.saveUsers(); await Backend.savePlakalar(); await bpoReload(); filterDataByFacility();renderAll();showToast('Yedek Supabase veritabanına aktarıldı.');
+  }catch(e){alert('Yedek yüklenemedi: '+e.message);}finally{event.target.value='';}
+}
+async function adminResetAllToDefault(){
+  if(!requireAdmin('Fabrika ayarlarına dönüş'))return;
+  if(!confirm('Tüm veritabanını varsayılan fabrika ayarlarına döndürmek istediğinize emin misiniz?'))return;
+  try{await bpoApi('/api/state',{method:'POST',body:JSON.stringify({action:'reset'})});dataset=[];chatMessages=[];auditLog=[];usersList=JSON.parse(JSON.stringify(initialUsers));allowedPlakalar=[...initialPlakalar];await Backend.saveUsers();await Backend.savePlakalar();await bpoReload();renderAll();showToast('Veritabanı sıfırlandı.');}catch(e){alert('Sıfırlama başarısız: '+e.message);}
+}
+</script>
+</body>
+</html>
